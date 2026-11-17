@@ -30,6 +30,16 @@ This repository holds both releases from the same code:
 3. In `android-app/android/app/build.gradle`, raise `versionCode` by one and set `versionName`.
 4. Commit. The website updates on its own. Run the Android workflow and upload the new `.aab` to Play.
 
+## Licence and citation
+
+Software: MIT. Instrument content (items, drawings, scoring, translations): CC BY-NC-ND 4.0. See `LICENSE`, `THIRD_PARTY.md` and `CITATION.cff`. Each GitHub release is archived on Zenodo with a DOI.
+
 ## Data
 
-Nothing leaves the device unless the examiner copies it. The Android app's data is excluded from device backups. See `web/privacy.html`.
+Nothing leaves the device unless the examiner copies, downloads or shares it. Each completed assessment is kept in a log on the device; export it after each clinic and clear it. The Android app's data is excluded from device backups. See `web/privacy.html`.
+
+Study protocol requirements for sites:
+- Collect study data with the Android app. On the website the log sits in browser storage and "Clear browsing data" erases it.
+- Use tablets with a screen lock managed by the institution; the log holds many patients' records unencrypted.
+- Use one tablet model per site; reaction times and cancellation geometry depend on screen size and touch latency.
+- Decide in advance whether instructions come from the examiner or the device voice, and keep to it. The export records, per task, where the device voice was used (`vs`) and the translation version (`tv`).
