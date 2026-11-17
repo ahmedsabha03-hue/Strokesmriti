@@ -99,7 +99,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.7.4";
+const VERSION="0.7.5";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -479,16 +479,18 @@ function rSym(){const Y=S.sym;
 }
 
 /* 8 go/no-go with rule reversal */
-function gngSchedule(seed,nGo,nNo){const r=mulberry32(seed);for(let k=0;k<2000;k++){const a=shuffle([...Array(nGo).fill("go"),...Array(nNo).fill("no")],r);let ok=a[0]==="go";for(let i=1;i<a.length;i++)if(a[i]==="no"&&a[i-1]==="no")ok=false;if(ok)return a.map(t=>({t,isi:1000+Math.floor(r()*500)}))}}
+/* Go/No-Go timing: stimulus visible 800 ms; responses accepted until 1000 ms after onset (responses 800–1000 ms counted as late hits); next stimulus 1500–1999 ms after the previous onset */
+const GNG_STIM=800,GNG_WIN=1000;
+function gngSchedule(seed,nGo,nNo){const r=mulberry32(seed);for(let k=0;k<2000;k++){const a=shuffle([...Array(nGo).fill("go"),...Array(nNo).fill("no")],r);let ok=a[0]==="go";for(let i=1;i<a.length;i++)if(a[i]==="no"&&a[i-1]==="no")ok=false;if(ok)return a.map(t=>({t,soa:1500+Math.floor(r()*500)}))}}
 function gngRes(log){const go=log.filter(x=>x.t==="go"),no=log.filter(x=>x.t==="no"),hits=go.filter(x=>x.resp!=null);
- return{nGo:go.length,nNo:no.length,hits:hits.length,om:go.length-hits.length,com:no.filter(x=>x.resp!=null).length,antic:hits.filter(x=>x.resp<150).length,rt:median(hits.filter(x=>x.resp>=150).map(x=>x.resp)),rtcv:cv(hits.filter(x=>x.resp>=150).map(x=>x.resp))}}
+ return{nGo:go.length,nNo:no.length,hits:hits.length,om:go.length-hits.length,com:no.filter(x=>x.resp!=null).length,antic:hits.filter(x=>x.resp<150).length,late:hits.filter(x=>x.resp>GNG_STIM).length,rt:median(hits.filter(x=>x.resp>=150).map(x=>x.resp)),rtcv:cv(hits.filter(x=>x.resp>=150).map(x=>x.resp))}}
 function rGng(){const G=S.gng;
  const tbl=(b,lab)=>b?`<tr><td>${lab}</td><td class="n">${b.hits} / ${b.nGo}</td><td class="n">${b.com} / ${b.nNo}</td><td class="n">${b.rt==null?"NA":Math.round(b.rt)+" ms"}</td><td class="n">${b.antic}</td><td class="n">${b.rtcv??"NA"}</td></tr>`:"";
  const results=(G.b1||G.b2)?`<table><tr><th>Block</th><th>Go hits</th><th>Commission errors</th><th>Median RT</th><th>Anticipations</th><th>RT variability (CV)</th></tr>${tbl(G.b1,"1 · green = touch")}${tbl(G.b2,"2 · rule reversed")}</table>`:"";
  if(G.na){shell("Go / No-Go with rule switch","",`<p class="note">Not administered.</p><div class="row"><button id="redo">Administer</button></div>`);$("#redo").onclick=()=>{S.gng={b1:null,b2:null,na:false};rerender()};return}
  if(G.b1&&G.b2){shell("Go / No-Go with rule switch","Inhibition, then switching to a reversed rule",results+`<div class="row"><button id="redo" class="small">Repeat both blocks</button></div>`);$("#redo").onclick=()=>{S.gng={b1:null,b2:null,na:false};rerender()};return}
  const block=G.b1?2:1;
- shell("Go / No-Go with rule switch",`Block ${block} of 2. Patient uses the unaffected hand. Block 1: 30 trials (22 go, 8 no-go). Block 2: 20 trials with the rule reversed (14 go, 6 no-go).`,`${results}${say(block===1?"gng":"gng_rev")}
+ shell("Go / No-Go with rule switch",`Block ${block} of 2. Patient uses the unaffected hand. Block 1: 30 trials (22 go, 8 no-go). Block 2: 20 trials with the rule reversed (14 go, 6 no-go). Each shape shows for 0.8 s; touches up to 1 s count; a new shape every 1.5–2 s.`,`${results}${say(block===1?"gng":"gng_rev")}
   <div class="row"><button class="pri" id="prac">Practice</button><button id="run" disabled>Start block ${block}</button><button id="na">Not administered</button><span class="note" id="st"></span></div>
   <div class="arena" id="arena" style="height:340px"></div>`);
  const rev=block===2;let timers=[],active=null,log=[];const A=$("#arena");const clear=()=>{timers.forEach(clearTimeout);timers=[]};
@@ -496,11 +498,11 @@ function rGng(){const G=S.gng;
  const run=(sched,practice)=>{let i=0;log=[];$("#prac").disabled=true;$("#run").disabled=true;
   const next=()=>{if(i>=sched.length){A.innerHTML="";active=null;if(practice){$("#st").textContent="Practice done.";$("#prac").disabled=false;$("#run").disabled=false}else{S.gng["b"+block]=gngRes(log);rerender()}return}
    const trl=sched[i];show(trl.t);active={t:trl.t,on:performance.now(),resp:null};const a=active;
-   timers.push(setTimeout(()=>{A.innerHTML=""},800));
-   timers.push(setTimeout(()=>{log.push(a);if(practice){A.innerHTML=`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5a6574">${(a.t==="go")===(a.resp!=null)?"Good":"Remember the rule"}</div>`}active=null;i++;timers.push(setTimeout(next,trl.isi-100))},1100))};
+   timers.push(setTimeout(()=>{A.innerHTML=""},GNG_STIM));
+   timers.push(setTimeout(()=>{log.push(a);if(practice){A.innerHTML=`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#5a6574">${(a.t==="go")===(a.resp!=null)?"Good":"Remember the rule"}</div>`}active=null;i++;timers.push(setTimeout(next,Math.max(0,trl.soa-GNG_WIN)))},GNG_WIN))};
   timers.push(setTimeout(next,800))};
  A.addEventListener("pointerdown",e=>{e.preventDefault();if(active&&active.resp==null)active.resp=performance.now()-active.on});
- $("#prac").onclick=()=>run([{t:"go",isi:1200},{t:"go",isi:1200},{t:"no",isi:1200},{t:"go",isi:1200}],true);
+ $("#prac").onclick=()=>run([{t:"go",soa:2000},{t:"go",soa:2000},{t:"no",soa:2000},{t:"go",soa:2000}],true);
  $("#run").onclick=()=>run(block===1?gngSchedule(FORM_SEED[form()]+400,22,8):gngSchedule(FORM_SEED[form()]+450,14,6),false);
  $("#na").onclick=()=>{clear();S.gng={b1:null,b2:null,na:true};rerender()};
  cleanup=clear;
@@ -707,7 +709,9 @@ function rPhq(){const t=phqTotal();
 
 /* 15 informant */
 function infDefaultMode(){if(S.prev&&S.prev.visits.some(v=>v.infm==="b"))return"f";const t=timepoint();return(!t||t.d<=37)?"b":"f"}
-function infScore(){const a=S.inf.ans.filter(v=>v!=null&&v>0);return a.length?{mean:+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2),n:a.length}:null}
+/* informant score reported only if at least 6 of the 8 items have an applicable answer */
+const INF_MIN=6;
+function infScore(){const a=S.inf.ans.filter(v=>v!=null&&v>0);return a.length>=INF_MIN?{mean:+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2),n:a.length}:null}
 function rInf(){const I=S.inf;if(!I.mode)I.mode=infDefaultMode();const sc=infScore();
  const opts=[1,2,3,4,0];
  shell("Informant questions","A family member or carer who has known the patient well for at least the last 5 years. Ask the informant away from the patient if possible.",`
@@ -718,7 +722,7 @@ function rInf(){const I=S.inf;if(!I.mode)I.mode=infDefaultMode();const sc=infSco
  <div><label>Lives with the patient</label><select id="lives">${[["","Select"],["yes","Yes"],["no","No"]].map(([k,l])=>`<option value="${k}" ${I.lives===k?"selected":""}>${l}</option>`).join("")}</select></div></div>
  ${say(I.mode==="b"?"inf_b":"inf_f")}
  ${[1,2,3,4,5,6,7,8].map(n=>`<div class="item"><div style="flex:1 1 260px">${n}. ${esc(tr("inf"+n))}${spkBtn("inf"+n,1)}${L()!=="en"&&T["inf"+n][L()]?`<div class="note">${esc(T["inf"+n].en)}</div>`:""}</div><div class="row">${opts.map(v=>`<button class="${I.ans[n-1]===v?"sel":""}" data-i="${n-1}" data-v="${v}" style="font-size:13px;padding:7px 10px">${esc(tr("inf_o"+v))}</button>`).join("")}</div></div>`).join("")}
- <p>Mean score: <b>${sc?sc.mean:"incomplete"}</b>${sc?` from ${sc.n} items (1 better, 2 same, 3 a little worse, 4 much worse)`:""}</p>
+ <p>Mean score: <b>${sc?sc.mean:`not reported (needs at least ${INF_MIN} of 8 answered)`}</b>${sc?` from ${sc.n} items (1 better, 2 same, 3 a little worse, 4 much worse)`:""}</p>
  <div class="row"><button id="ina" class="small">No suitable informant</button></div>`}`);
  $$("[data-mode]").forEach(b=>b.onclick=()=>{I.mode=b.dataset.mode;rerender()});
  $$("[data-i]").forEach(b=>b.onclick=()=>{I.ans[+b.dataset.i]=+b.dataset.v;rerender()});
@@ -740,7 +744,7 @@ function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();
   dsf:S.ds.fwd.done?S.ds.fwd.longest:null,dsb:S.ds.bwd.done?S.ds.bwd.longest:null,
   cl:S.can.done?S.can.hitsL:null,cr:S.can.done?S.can.hitsR:null,cfp:S.can.done?S.can.fp:null,ct:S.can.done?S.can.time:null,coc:S.can.done&&S.can.coc!=null?+S.can.coc.toFixed(3):null,
   sm:S.sym.done?S.sym.correct:null,se:S.sym.done?S.sym.err:null,srt:S.sym.done&&S.sym.rt!=null?Math.round(S.sym.rt):null,
-  g1h:S.gng.b1?S.gng.b1.hits:null,g1c:S.gng.b1?S.gng.b1.com:null,g1rt:S.gng.b1&&S.gng.b1.rt!=null?Math.round(S.gng.b1.rt):null,
+  g1h:S.gng.b1?S.gng.b1.hits:null,g1late:S.gng.b1?n(S.gng.b1.late):null,g2late:S.gng.b2?n(S.gng.b2.late):null,g1c:S.gng.b1?S.gng.b1.com:null,g1rt:S.gng.b1&&S.gng.b1.rt!=null?Math.round(S.gng.b1.rt):null,
   g2h:S.gng.b2?S.gng.b2.hits:null,g2c:S.gng.b2?S.gng.b2.com:null,g2rt:S.gng.b2&&S.gng.b2.rt!=null?Math.round(S.gng.b2.rt):null,
   nm:namK.length===NAMING.length?namK.reduce((a,k)=>a+S.nam.res[k],0):null,cp:S.comp.idx>=COMP.length?S.comp.res.filter(x=>x).length:null,
   fl:S.flu.done&&!S.flu.na?S.flu.count:null,flr:S.flu.done&&!S.flu.na?S.flu.rep:null,
@@ -778,8 +782,8 @@ function readLog(){try{return JSON.parse(localStorage.getItem(LOG_KEY)||"[]")}ca
 function logRecord(flat){try{const id=S.started+"|"+(S.p.id||"");const log=readLog().filter(r=>r._sid!==id);log.push(Object.assign({_sid:id,_saved:new Date().toISOString()},flat));while(log.length>1500)log.shift();localStorage.setItem(LOG_KEY,JSON.stringify(log));window.LOG_FAIL=false}catch(e){window.LOG_FAIL=true}}
 function logCSV(){const log=readLog();if(!log.length)return"";const keys=csvKeys(log[log.length-1]).concat(["_saved"]);log.forEach(r=>Object.keys(r).forEach(k=>{if(k!=="_sid"&&!keys.includes(k))keys.push(k)}));const q=x=>`"${String(x==null?"":x).replace(/"/g,'""')}"`;return keys.join(",")+"\n"+log.map(r=>keys.map(k=>q(r[k])).join(",")).join("\n")}
 function renderLogBox(){const b=$("#logbox");if(!b)return;const n=readLog().length;
- const failMsg=window.LOG_FAIL?`<p class="flag red">This assessment was NOT saved to the device log (device storage is full or blocked). Copy the results now, then download the log and clear it.</p>`:"";
  const web=!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+ const failMsg=window.LOG_FAIL?`<p class="flag red">This assessment was NOT saved to the device log (device storage is full or blocked). Copy the results now, then download the log and clear it.</p>`:"";
  b.innerHTML=`${failMsg}<p class="note">${n} assessment${n===1?"":"s"} saved on this device, one row each with fixed columns. Export regularly to your study sheet, then clear.</p>${n>=400?`<p class="flag red">The log has ${n} rows. Download it and clear it now; beyond 1500 the oldest rows are dropped.</p>`:""}${web?`<p class="warn">On the website the log lives in this browser's storage and is erased by "Clear browsing data". For study data collection use the Android app, and download the log after each clinic.</p>`:""}<div class="row"><button id="lgdl">Download log (CSV)</button><button id="lgsh">Share log</button><button id="lgcp">Copy log</button><button id="lgclr">Clear log</button><span class="note" id="lgmsg"></span></div>`;
  const name=()=>`strokesmriti_log_${new Date().toISOString().slice(0,10)}.csv`,blob=()=>new Blob(["\ufeff"+logCSV()],{type:"text/csv"});
  $("#lgdl").onclick=()=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(blob());a.download=name();document.body.appendChild(a);a.click();a.remove();$("#lgmsg").textContent="Download started"}catch(e){$("#lgmsg").textContent="Download not available here; use Share or Copy"}};
@@ -810,7 +814,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  <p class="note">Raw scores only. No composite and no cutoffs until normative and validation data exist. Interpret against years of education. Process measures (slope, intrusions, search organisation, reaction time variability, fluency time course) are research outputs.</p>
  ${Object.keys(S.idx).length?`<h3>Index event</h3><p class="note">${Object.keys(S.idx).length} procedure and imaging fields recorded${fpe()!=null?`; first-pass effect ${fpe()?"yes":"no"}`:""}. Included in the study export and the device log, not in the visit code.</p>`:""}
  <h3>Visit code for the next visit</h3><p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
- <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv">Copy visit code</button></div>
+ <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>
  <h3>Export for the study sheet</h3>
  <div class="row"><button id="csv">Copy CSV</button><button id="json">Copy JSON</button><button id="new">New assessment</button><span class="note" id="cpmsg"></span></div>
  <textarea id="out" readonly style="height:110px;font:12px ui-monospace,monospace"></textarea>
@@ -824,7 +828,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const allV=[...(S.prev?S.prev.visits:[]),lean(v)];
  /* keep the first visit (baseline, informant pre-stroke rating) plus the three most recent */
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
- packCode(history).then(c=>{$("#vcode").textContent=c;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
+ packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
  const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
   Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),{flags:f.map(x=>x[0]).join(" | ")});
