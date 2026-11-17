@@ -22,10 +22,14 @@ header .wm{display:flex;flex-direction:column;line-height:1.15}
 header h1{font-size:22px;margin:0;font-weight:700;letter-spacing:.2px}
 header h1 span{color:var(--gold)}
 header .tl{font-size:12.5px;color:#c9d6e4}
-header .by{margin-left:auto;text-align:right;font-size:12.5px;color:#c9d6e4;line-height:1.3}
+header .lsw{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:4px 8px 4px 10px;margin-bottom:0}
+header .lsw svg{width:18px;height:18px;flex:none}
+header .lsw select{background:transparent;color:#fff;border:0;padding:4px 2px;font-size:15px;width:auto;cursor:pointer}
+header .lsw select option{color:#1b2330}
+header .by{margin-left:14px;text-align:right;font-size:12.5px;color:#c9d6e4;line-height:1.3}
 header .by b{display:block;color:#fff;font-size:14px;font-weight:600}
 header .tag{max-width:940px;margin:6px auto 0;font-size:11.5px;color:#9fb3c8}
-@media(max-width:620px){header .by{display:none}header h1{font-size:19px}}
+@media(max-width:620px){header .by,header .tl{display:none}header h1{font-size:19px}header .lsw{padding:3px 6px}header .lsw select{font-size:14px;max-width:130px}}
 .prog{height:4px;background:rgba(255,255,255,.18);margin:8px -18px 0}.prog div{height:4px;background:var(--gold);transition:width .2s}
 footer{max-width:940px;margin:6px auto 28px;padding:0 16px;font-size:12.5px;color:var(--mute);display:flex;align-items:center;gap:10px}
 footer svg{width:26px;height:26px;flex:none}
@@ -87,7 +91,7 @@ td.n{font-variant-numeric:tabular-nums}
 </head>
 <body>
 <header>
-  <div class="t"><div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg></div><div class="wm"><h1>Stroke<span>Smriti</span></h1><span class="tl">Cognitive outcomes after stroke</span></div><div class="by">Created by<b>Dr Sabha Ahmed</b>MD, DM, FRCR</div></div>
+  <div class="t"><div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg></div><div class="wm"><h1>Stroke<span>Smriti</span></h1><span class="tl">Cognitive outcomes after stroke</span></div><label class="lsw" title="Patient language"><svg viewBox="0 0 24 24" fill="none" stroke="#f2a541" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg><select id="hlang" aria-label="Patient language"></select></label><div class="by">Created by<b>Dr Sabha Ahmed</b>MD, DM, FRCR</div></div>
   <div class="tag">v<span id="ver"></span> · research use only · not validated · keeps only the in-progress session on this device</div>
   <div class="prog"><div id="prog"></div></div>
 </header>
@@ -95,7 +99,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use.</div></footer>
 <script>
 "use strict";
-const VERSION="0.6.0";
+const VERSION="0.6.1";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -110,6 +114,8 @@ function median(a){if(!a.length)return null;const s=a.slice().sort((x,y)=>x-y);c
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 const FORM_SEED={A:1101,B:2203,C:3307};
 const LANGS=[["en","English"],["hi","Hindi"],["kn","Kannada"],["ta","Tamil"],["ml","Malayalam"],["or","Odia"],["bn","Bengali"],["te","Telugu"]];
+const NATIVE={en:"English",hi:"हिन्दी",kn:"ಕನ್ನಡ",ta:"தமிழ்",ml:"മലയാളം",or:"ଓଡ଼ିଆ",bn:"বাংলা",te:"తెలుగు"};
+function syncHLang(){const s=document.getElementById("hlang");if(!s)return;if(!s.options.length){s.innerHTML=LANGS.map(([k,l])=>`<option value="${k}">${NATIVE[k]}${k==="en"?"":" · "+l}</option>`).join("");s.onchange=()=>{S.p.lang=s.value;stopSpeech();rerender()}}s.value=S.p.lang}
 
 /* ---------- patient and informant scripts. status per language in LSTATUS ---------- */
 const T={
@@ -279,12 +285,12 @@ function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,150)}
 function clearSaved(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
 function loadSaved(){try{const o=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");if(o&&o.S&&o.S.p)return o}catch(e){}return null}
 document.addEventListener("click",saveSoon,true);document.addEventListener("input",saveSoon,true);document.addEventListener("change",saveSoon,true);
-function go(i){stopSpeech();if(cleanup){cleanup();cleanup=null}{const dir=i>=cur?1:-1;i=Math.max(0,Math.min(STEPS.length-1,i));while(!stepOn(i)&&i>0&&i<STEPS.length-1)i+=dir}if(S.exported&&cur===STEPS.length-1&&i!==cur){S.exportSnap=JSON.stringify(visitRecord());S.exported=false}cur=Math.max(0,Math.min(STEPS.length-1,i));$("#prog").style.width=(100*cur/(STEPS.length-1))+"%";STEPS[cur][2]();window.scrollTo(0,0);save()}
+function go(i){stopSpeech();if(cleanup){cleanup();cleanup=null}{const dir=i>=cur?1:-1;i=Math.max(0,Math.min(STEPS.length-1,i));while(!stepOn(i)&&i>0&&i<STEPS.length-1)i+=dir}if(S.exported&&cur===STEPS.length-1&&i!==cur){S.exportSnap=JSON.stringify(visitRecord());S.exported=false}cur=Math.max(0,Math.min(STEPS.length-1,i));$("#prog").style.width=(100*cur/(STEPS.length-1))+"%";STEPS[cur][2]();syncHLang();window.scrollTo(0,0);save()}
 function shell(title,sub,body,opts={}){$("#app").innerHTML=`<div class="card"><div class="note">Step ${STEPS.map((x,i)=>i).filter(stepOn).indexOf(cur)+1} of ${STEPS.map((x,i)=>i).filter(stepOn).length}${S.p.mode==="core"?" · core battery":""}</div><h2>${title}</h2>${sub?`<div class="sub">${sub}</div>`:""}${interpNote()}${body}</div>
  <div class="nav">${cur>0?`<button id="back">Back</button>`:"<span></span>"}${cur<STEPS.length-1?`<button class="pri" id="next">Next</button>`:""}</div>`;
  {const ad=adaptSide(),pics=$$(".pics");if(ad&&STEPS[cur][0]!=="cancel"&&pics.length){pics.forEach(p=>p.classList.add(ad==="left"?"adR":"adL"));$(".card").insertAdjacentHTML("afterbegin",`<div class="exam">Layout shifted to the ${ad==="left"?"right":"left"} for ${ad}-sided field loss or neglect. Keep the tablet toward the patient's ${ad==="left"?"right":"left"}.</div>`)}}
  if($("#back"))$("#back").onclick=()=>go(cur-1);if($("#next"))$("#next").onclick=()=>{if(opts.onNext&&opts.onNext()===false)return;go(cur+1)}}
-function rerender(){STEPS[cur][2]();save()}
+function rerender(){STEPS[cur][2]();syncHLang();save()}
 function okBad(id,val){return `<button class="okb ${val===1?"sel":""}" data-id="${id}" data-v="1">Correct</button><button class="badb ${val===0?"sel":""}" data-id="${id}" data-v="0">Incorrect</button>`}
 
 /* 1 setup */
