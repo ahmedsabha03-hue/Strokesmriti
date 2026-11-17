@@ -3,7 +3,7 @@
 App name: StrokeSmriti
 
 Short description (80 characters max):
-Clinician-run cognitive assessment after stroke, in eight Indian languages.
+Clinician-run cognitive assessment after stroke, in Indian languages.
 
 Full description:
 StrokeSmriti helps clinicians measure thinking and memory after a stroke and after stroke procedures such as thrombectomy, thrombolysis and carotid stenting or endarterectomy.
@@ -12,11 +12,11 @@ The examiner sits with the patient and reads each instruction in the patient's l
 
 Tasks: orientation, picture learning with delayed recall and recognition, digit span, target cancellation, pattern matching, go/no-go, picture naming and comprehension by pointing, animal fluency, clock drawing, figure copy, everyday money and medicine-card tasks, modified Rankin Scale, PHQ-9, and a short interview with a family member.
 
-Languages: English, Hindi, Kannada, Tamil, Malayalam, Odia, Bengali and Telugu. Pointing versions of several tasks allow testing in patients with aphasia or limited literacy.
+Languages: English, Hindi, Kannada, Tamil, Malayalam, Odia, Bengali and Telugu. Hindi is approved; the other translations are forward drafts under back-translation, and the app shows each language's status. A read-aloud button speaks every instruction in the patient's language. Pointing versions of several tasks allow testing in patients with aphasia or limited literacy.
 
 Three parallel forms reduce practice effects across visits. A visit code carries results to the next assessment, on any device, without a server.
 
-Privacy: no accounts, no analytics, no upload. The app works offline. It keeps only the session in progress, uses a study ID instead of a name, and deletes the session once results are copied.
+Privacy: no accounts, no analytics, no upload. The app works offline and uses a study ID instead of a name. Completed results are kept in a log on the device until the examiner exports and clears it.
 
 StrokeSmriti is a research tool. It is not validated, does not give a diagnosis and is not a medical device. Domain scores are reported without cut-offs until validation is complete.
 

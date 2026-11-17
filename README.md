@@ -1,4 +1,4 @@
-# StrokeSmriti v0.5.0
+# StrokeSmriti
 
 Clinician-administered cognitive outcome assessment after stroke and stroke procedures. Eight languages, offline, no server.
 
