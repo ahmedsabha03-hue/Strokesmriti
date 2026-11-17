@@ -1,6 +1,6 @@
 # StrokeSmriti
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24323875.svg)](https://doi.org/10.5281/zenodo.24323875)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24323874.svg)](https://doi.org/10.5281/zenodo.24323874)
 
 Clinician-administered cognitive outcome assessment after stroke and stroke procedures. Eight languages, offline, no server.
 
@@ -34,7 +34,7 @@ This repository holds both releases from the same code:
 
 ## Licence and citation
 
-Software: MIT. Instrument content (items, drawings, scoring, translations): CC BY-NC-ND 4.0. See `LICENSE`, `THIRD_PARTY.md` and `CITATION.cff`. Each GitHub release is archived on Zenodo. Cite StrokeSmriti as: Ahmed S. StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures. Zenodo. doi:10.5281/zenodo.24323875
+Software: MIT. Instrument content (items, drawings, scoring, translations): CC BY-NC-ND 4.0. See `LICENSE`, `THIRD_PARTY.md` and `CITATION.cff`. Each GitHub release is archived on Zenodo; the DOI below always resolves to the latest version. Cite StrokeSmriti as: Ahmed S. StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures. Zenodo. doi:10.5281/zenodo.24323874
 
 ## Data
 
