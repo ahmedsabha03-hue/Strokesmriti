@@ -1,0 +1,5 @@
+android-app/www/
+android-app/node_modules/
+*.jks
+*.keystore
+keystore.properties
