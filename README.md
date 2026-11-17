@@ -19,7 +19,7 @@ This repository holds both releases from the same code:
 
 1. Register at play.google.com/console (one-time fee of USD 25, about ₹2,100). A personal account needs identity verification. Google requires new personal accounts to run a closed test with at least 12 testers for 14 days before releasing to production. Line up 12 colleagues with Android phones or tablets early.
 2. Create the app, then use `STORE_LISTING.md` for the text and the files in `store-graphics/` for the images.
-3. Privacy policy URL: `https://<your site>/privacy.html`. Add a contact email to `web/privacy.html` first.
+3. Privacy policy URL: `https://<your site>/privacy.html`. The contact email is already in `web/privacy.html`.
 4. Let Google manage the app signing key (Play App Signing). The key in the secrets file is only the upload key.
 5. Upload the `.aab` to Closed testing, add the testers, and after 14 days apply for production.
 
