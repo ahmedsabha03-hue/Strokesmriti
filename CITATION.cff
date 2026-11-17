@@ -3,11 +3,16 @@ message: "If you use StrokeSmriti, please cite it as below."
 title: "StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures"
 abstract: "Free tablet tool for measuring cognition after stroke, thrombectomy, thrombolysis and carotid or intracranial revascularisation in India. Eight languages, read-aloud instructions, pointing versions for aphasia and limited literacy, three parallel forms, procedure-anchored timepoints, and process measures. Research use only; not yet validated."
 type: software
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24323875"
+    description: "Zenodo archive of StrokeSmriti"
 authors:
   - family-names: Ahmed
     given-names: Sabha
     email: ahmedsabha03@gmail.com
-version: "0.7.1"
+doi: "10.5281/zenodo.24323875"
+version: "0.7.2"
 date-released: "2026-11-18"
 repository-code: "https://github.com/ahmedsabha03-hue/Strokesmriti"
 url: "https://ahmedsabha03-hue.github.io/Strokesmriti/"
