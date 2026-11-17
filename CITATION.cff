@@ -11,6 +11,7 @@ authors:
   - family-names: Ahmed
     given-names: Sabha
     email: ahmedsabha03@gmail.com
+    orcid: "https://orcid.org/0000-0001-8567-1150"
 doi: "10.5281/zenodo.24323875"
 version: "0.7.2"
 date-released: "2026-11-18"

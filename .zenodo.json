@@ -1,9 +1,22 @@
 {
   "title": "StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures",
   "description": "Free tablet tool for measuring cognition after stroke, thrombectomy, thrombolysis and carotid or intracranial revascularisation in India. Eight languages, read-aloud instructions, pointing versions for aphasia and limited literacy, three parallel forms, procedure-anchored timepoints and process measures. Research use only; not yet validated. Software under MIT; instrument content under CC BY-NC-ND 4.0.",
-  "creators": [{"name": "Ahmed, Sabha"}],
+  "creators": [
+    {
+      "name": "Ahmed, Sabha",
+      "orcid": "0000-0001-8567-1150"
+    }
+  ],
   "upload_type": "software",
   "access_right": "open",
   "license": "other-open",
-  "keywords": ["stroke", "cognition", "thrombectomy", "carotid stenting", "neuropsychological assessment", "India", "multilingual"]
+  "keywords": [
+    "stroke",
+    "cognition",
+    "thrombectomy",
+    "carotid stenting",
+    "neuropsychological assessment",
+    "India",
+    "multilingual"
+  ]
 }
