@@ -18,6 +18,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
+          cache-dependency-path: android-app/android/**/*.gradle*
       - name: Check Android SDK (preinstalled on the runner)
         run: echo "ANDROID_HOME=$ANDROID_HOME" && ls "$ANDROID_HOME/platforms" | tail -3
       - run: npm ci
@@ -34,7 +36,10 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: chmod +x gradlew && ./gradlew --no-daemon bundleRelease assembleRelease
+        run: |
+          chmod +x gradlew
+          # Maven Central sometimes rate-limits shared build machines (HTTP 429); retry twice before failing
+          for i in 1 2 3; do ./gradlew --no-daemon bundleRelease assembleRelease && exit 0; echo "Build attempt $i failed, retrying in 60 s"; sleep 60; done; exit 1
       - uses: actions/upload-artifact@v4
         with:
           name: strokesmriti-android
