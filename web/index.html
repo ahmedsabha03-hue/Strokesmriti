@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.7";
+const VERSION="0.9.8";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -305,16 +305,45 @@ function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,150)}
 function clearSaved(){try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(PHOTO_KEY)}catch(e){}}
 function loadSaved(){try{const o=JSON.parse(localStorage.getItem(SAVE_KEY)||"null");if(o&&o.S&&o.S.p)return o}catch(e){}return null}
 document.addEventListener("click",saveSoon,true);document.addEventListener("input",saveSoon,true);document.addEventListener("change",saveSoon,true);
-function go(i){stopSpeech();if(cleanup){cleanup();cleanup=null}{const dir=i>=cur?1:-1;i=Math.max(0,Math.min(STEPS.length-1,i));while(!stepOn(i)&&i>0&&i<STEPS.length-1)i+=dir}if(S.exported&&cur===STEPS.length-1&&i!==cur){S.exportSnap=JSON.stringify(visitRecord());S.exported=false}cur=Math.max(0,Math.min(STEPS.length-1,i));$("#prog").style.width=(100*cur/(STEPS.length-1))+"%";STEPS[cur][2]();syncHLang();window.scrollTo(0,0);save()}
+function go(i){stopSpeech();{const now=Date.now();if(S._tIn!=null){const id=STEPS[cur][0];S.tt=S.tt||{};S.tt[id]=(S.tt[id]||0)+Math.round((now-S._tIn)/1000)}S._tIn=now}keepAwake();if(cleanup){cleanup();cleanup=null}{const dir=i>=cur?1:-1;i=Math.max(0,Math.min(STEPS.length-1,i));while(!stepOn(i)&&i>0&&i<STEPS.length-1)i+=dir}if(S.exported&&cur===STEPS.length-1&&i!==cur){S.exportSnap=JSON.stringify(visitRecord());S.exported=false}cur=Math.max(0,Math.min(STEPS.length-1,i));$("#prog").style.width=(100*cur/(STEPS.length-1))+"%";STEPS[cur][2]();syncHLang();window.scrollTo(0,0);save()}
 function shell(title,sub,body,opts={}){$("#app").innerHTML=`<div class="card"><div class="note">Step ${STEPS.map((x,i)=>i).filter(stepOn).indexOf(cur)+1} of ${STEPS.map((x,i)=>i).filter(stepOn).length}${S.p.mode==="core"?" · core battery":""}</div><h2>${title}</h2>${sub?`<div class="sub">${sub}</div>`:""}${interpNote()}${body}</div>
  <div class="nav">${cur>0?`<button id="back">Back</button>`:"<span></span>"}${cur<STEPS.length-1?`<button class="pri" id="next">Next</button>`:""}</div>`;
  {const ad=adaptSide(),pics=$$(".pics");if(ad&&STEPS[cur][0]!=="cancel"&&pics.length){pics.forEach(p=>p.classList.add(ad==="left"?"adR":"adL"));$(".card").insertAdjacentHTML("afterbegin",`<div class="exam">Layout shifted to the ${ad==="left"?"right":"left"} for ${ad}-sided field loss or neglect. Keep the device toward the patient's ${ad==="left"?"right":"left"}.</div>`)}}
+ recallClock();
  if($("#back"))$("#back").onclick=()=>go(cur-1);if($("#next"))$("#next").onclick=()=>{if(opts.onNext&&opts.onNext()===false)return;go(cur+1)}}
 function rerender(){STEPS[cur][2]();syncHLang();save()}
 function okBad(id,val){return `<button class="okb ${val===1?"sel":""}" data-id="${id}" data-v="1">Correct</button><button class="badb ${val===0?"sel":""}" data-id="${id}" data-v="0">Incorrect</button>`}
 
+/* ---------- examiner helpers: visit windows, setup checks, recall-delay clock, wake lock, step timing ---------- */
+const WIN=[["Acute / discharge",0,10],["30 days",23,37],["90 days",75,105],["6 months",150,210],["12 months",330,400]];
+function idxDate(){return S.p.intervDate||S.p.strokeDate||""}
+function addDays(iso,n){const d=parseLocal(iso);d.setDate(d.getDate()+n);return d}
+function fmtD(d){return d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}
+function nearestWin(d){let best=null,bd=1e9;WIN.forEach(w=>{const dist=d<w[1]?w[1]-d:d>w[2]?d-w[2]:0;if(dist<bd){bd=dist;best=w}});return best}
+/* next core visit, for the slip the family photographs */
+function nextVisit(){if(isCtl())return null;const tp=timepoint(),i=idxDate();if(!tp||!i)return null;
+ if(elective()){if(tp.lab==="Pre-procedure")return{lab:"Post-procedure (24–72 h)",a:addDays(i,1),b:addDays(i,3)};if(tp.lab.startsWith("Post-procedure")||tp.d<23)return{lab:"30 days",a:addDays(i,23),b:addDays(i,37)};return null}
+ const w=tp.d<75?WIN[2]:tp.d<330?WIN[4]:null;return w?{lab:w[0],a:addDays(i,w[1]),b:addDays(i,w[2])}:null}
+function setupIssues(){const p=S.p,m=[],w=[];
+ if(!p.id)m.push("Study ID");if(!p.age)m.push(isCtl()?"Age":"Age at stroke");if(p.edu===""||p.edu==null)m.push("Years of education");if(!p.lit)m.push("Can read and write");if(!p.hand)m.push("Handedness");
+ if(!p.sens)m.push("Vision and hearing");if(!p.exl)m.push("Whether you speak the patient's language");if(!p.exr)m.push("Examiner role");
+ if(isCtl()){if(CEX.some(([k])=>!p[k]))m.push("Eligibility checklist");if(!p.cord)m.push("Form order")}
+ else{if(!p.strokeDate&&!p.intervDate)m.push("Stroke onset or intervention date");if(!p.interv)m.push("Intervention");if(!p.side)m.push("Lesion side");if(!p.vf)m.push("Visual fields")}
+ if(p.age&&(+p.age<18||+p.age>110))w.push(`Age ${p.age} looks wrong`);if(p.edu!==""&&p.edu!=null&&(+p.edu<0||+p.edu>25))w.push(`Education ${p.edu} years looks wrong`);
+ if(p.assessDate&&parseLocal(p.assessDate)>new Date())w.push("Assessment date is in the future");
+ const tp=timepoint();if(tp&&tp.lab.startsWith("Invalid"))w.push(tp.lab);if(tp&&tp.lab==="Unscheduled"){const n=nearestWin(tp.d);w.push(`Day ${tp.d} is outside every scheduled window; nearest is ${n[0]} (days ${n[1]}–${n[2]})`)}
+ return{m,w}}
+function keepAwake(){try{if("wakeLock" in navigator&&!window.WL&&document.visibilityState==="visible")navigator.wakeLock.request("screen").then(l=>{window.WL=l;l.addEventListener("release",()=>{window.WL=null})}).catch(()=>{})}catch(e){}}
+document.addEventListener("visibilitychange",keepAwake);
+let RDL=null;
+function recallClock(){clearInterval(RDL);RDL=null;const M=S.mem,id=STEPS[cur][0];if(!M.encEnd||M.dlDone||id==="learn"||id==="delayed"||id==="summary")return;
+ const el=document.createElement("div");el.className="exam";el.id="rdl";$(".card").insertAdjacentElement("afterbegin",el);
+ const tick=()=>{const sec=Math.floor((Date.now()-M.encEnd)/1000),tg=delayTarget()*60,mm=x=>`${Math.floor(x/60)}:${String(x%60).padStart(2,"0")}`;
+  if(!document.body.contains(el)){clearInterval(RDL);return}
+  el.textContent=sec>=tg?`Recall delay reached (${mm(sec)}). Go to delayed recall after this task.`:`Recall delay: ${mm(sec)} of ${delayTarget()}:00. Delayed recall comes at the end.`};
+ tick();RDL=setInterval(tick,1000)}
 /* 1 setup */
-function tpText(){const t=timepoint();if(isCtl())return t?`${t.lab}${ctlSess()>1?` · day ${t.d} after session 1`:""} · order ${S.p.cord||"not set"} · form ${form()}`:"Enter the assessment date.";return t?`${t.d<0?`${-t.d} day(s) before the procedure`:`Day ${t.d} after index date`} · timepoint: <b>${t.lab}</b>${optionalVisit(t.lab)?" (optional visit; form reused)":""} · form ${form()}`:"Enter intervention (or stroke) date and assessment date to set the timepoint."}
+function tpText(){const t=timepoint();if(isCtl())return t?`${t.lab}${ctlSess()>1?` · day ${t.d} after session 1`:""} · order ${S.p.cord||"not set"} · form ${form()}`:"Enter the assessment date.";return t?`${t.d<0?`${-t.d} day(s) before the procedure`:`Day ${t.d} after index date`} · timepoint: <b>${t.lab}</b>${t.lab==="Unscheduled"?` (nearest: ${nearestWin(t.d)[0]}, days ${nearestWin(t.d)[1]}–${nearestWin(t.d)[2]})`:""}${optionalVisit(t.lab)?" (optional visit; form reused)":""} · form ${form()}`:"Enter intervention (or stroke) date and assessment date to set the timepoint."}
 /* healthy-control block: purpose, counterbalancing order, session, eligibility, vascular risk */
 const CEX=[["ce_stroke","Stroke or TIA"],["ce_dem","Dementia, or a memory complaint the person or family is worried about"],["ce_neuro","Other neurological disease (epilepsy, Parkinson's, multiple sclerosis, brain tumour)"],["ce_tbi","Head injury with loss of consciousness"],["ce_psy","Major psychiatric illness (psychosis, bipolar disorder, current severe depression)"],["ce_sub","Alcohol or drug dependence, or sedating medicines in the last week"],["ce_sens","Vision or hearing too poor for the tasks"]];
 const CRF=[["rf_htn","Hypertension"],["rf_dm","Diabetes"],["rf_lip","High cholesterol"],["rf_cad","Heart disease or atrial fibrillation"]];
@@ -333,6 +362,8 @@ function ctlBlock(p,opt){const yn=k=>`<select data-k="${k}">${opt([["","Select"]
 function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${v===k?"selected":""}>${l}</option>`).join("");
  const prevList=S.prev?`<table><tr><th>Previous visit</th><th>Timepoint</th><th>Form</th></tr>${S.prev.visits.map(v=>`<tr><td>${v.dt?esc(v.dt):(v.d!=null?"Day "+v.d:"")}</td><td>${esc(v.tp)}</td><td>${esc(v.f)}</td></tr>`).join("")}</table>`:"";
  shell("Patient and session","Use a study ID only. Do not enter the patient's name.",`
+ <details class="note" style="margin-bottom:10px"><summary style="cursor:pointer"><b>Before you start</b></summary>
+ <ul style="padding-left:20px;margin:6px 0"><li>Quiet room, no family prompting the patient (the informant is asked separately).</li><li>Patient wearing their usual glasses and hearing aid.</li><li>Phone on silent or Do Not Disturb, brightness high, battery above 30%.</li><li>Plain paper and a pen ready for the clock and figure copy, with no name on the paper.</li><li>Patient seated, device within easy reach of the unaffected hand.</li><li>Time: about 18 minutes for the full battery, 6 for the core.</li></ul></details>
  <h3>Follow-up visit?</h3><p class="note">Paste the visit code from the patient's last assessment. It fills in the details below and shows change since last time.</p>
  <div class="row"><textarea id="pcode" rows="2" placeholder="PSC2..."></textarea></div><div class="row"><button id="load">Load previous visits</button><button id="scan" style="display:none">Scan QR with camera</button><span class="note" id="lmsg"></span></div>${prevList}
  <h3>Participant</h3><div class="row">${[["patient","Stroke patient"],["control","Healthy control"]].map(([k,l])=>`<button class="${(p.ptype||"patient")===k?"sel":""}" data-pt="${k}">${l}</button>`).join("")}</div>
@@ -363,7 +394,7 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <li>Repeat with the other eye.</li>
  <li>Then wiggle fingers on both sides at once. Seen alone on each side but missed on one side when both move = extinction (neglect, not field loss).</li>
  </ol>
- Both quadrants on one side missed in both eyes = hemianopia; one quadrant = quadrantanopia. A defect in one eye only is an eye problem: enter Full and note it. Cannot fixate or follow = Not tested.</details></div>
+ Both quadrants on one side missed in both eyes = hemianopia; one quadrant = quadrantanopia. A defect in one eye only is an eye problem: enter Full and note it. Cannot fixate or follow = Not tested.<br><b>From the NIHSS</b> (only if scored today): item 3 = 0 Full, 1 quadrantanopia on that side, 2 hemianopia on that side, 3 Not tested; item 11 inattention to one side = extinction on that side. Fields often recover, so retest at follow-up visits.</details></div>
  <div><label>Layout adaptation</label><select data-k="adapt">${opt([["auto","Automatic (from visual fields)"],["none","Off"],["left","Shift right (left-sided deficit)"],["right","Shift left (right-sided deficit)"]],p.adapt)}</select></div>
  <div><label>Assessment date</label><input type="date" data-k="assessDate" value="${esc(p.assessDate)}"></div>
  <div><label>Do you speak the patient's language?</label><select data-k="exl">${opt([["","Select"],["yes","Yes"],["int","No, an interpreter is helping"],["no_int","No, and no interpreter"]],p.exl||"")}</select><div class="note">The speaker button reads each instruction aloud in the patient's language.</div></div>
@@ -372,8 +403,9 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <div><label>Test form</label><select data-k="formSet">${opt([["auto","Automatic by timepoint"],["A","Form A"],["B","Form B"],["C","Form C"]],p.formSet)}</select></div>
  <div><label>Examiner role</label><select data-k="exr">${opt([["","Select"],["neuro","Neurologist or neuroradiologist"],["psy","Psychiatrist or psychologist"],["res","Resident or fellow"],["nurse","Nurse"],["ra","Research staff"],["other","Other"]],p.exr)}</select></div>
  <div><label>Device</label><input value="${{phone:"Phone",tablet:"Tablet",computer:"Computer, no touchscreen"}[devClass()]} · ${S.device.w}×${S.device.h} px" disabled>${devClass()==="computer"?`<div class="warn">No touchscreen detected. Use this only to look around or enter interview items; patient tasks need a phone or tablet.</div>`:""}${hasTouch()&&Math.min(screen.width,screen.height)<360?`<div class="warn">Screen below the 360 px minimum. Use a larger phone or a tablet.</div>`:""}</div>
- </div><p class="note" id="tp">${tpText()}</p>`);
- $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
+ </div><p class="note" id="tp">${tpText()}</p><div id="setwarn"></div>`,{onNext:()=>{if(S._swOK)return true;const {m,w}=setupIssues();if(!m.length&&!w.length)return true;
+  $("#setwarn").innerHTML=`<div class="flag" style="display:block;margin-top:8px">${m.length?`<b>Not filled in:</b> ${m.map(esc).join(", ")}.<br>`:""}${w.length?`<b>Check:</b> ${w.map(esc).join("; ")}.`:""}<br>Tap Next again to continue anyway.</div>`;S._swOK=true;$("#setwarn").scrollIntoView({block:"center"});return false}});
+ $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;S._swOK=false;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
  $$("[data-pt]").forEach(b=>b.onclick=()=>{S.p.ptype=b.dataset.pt;if(isCtl()){S.p.vtype="follow";if(!S.p.purpose)S.p.purpose="norm";if(!S.p.cord&&ctlSess()===1)S.p.cord=nextOrder()}rerender()});
  if("BarcodeDetector" in window&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){$("#scan").style.display="";$("#scan").onclick=()=>scanQR(t=>{$("#pcode").value=t;$("#load").click()})}
  $("#load").onclick=async()=>{try{const o=await unpackCode($("#pcode").value);S.prev=o;const {idx,...dm}=o.demo;S.idx=Object.assign({},idx||{});Object.assign(S.p,dm,{assessDate:S.p.assessDate,formSet:"auto",vtype:S.p.vtype,mode:S.p.mode,csess:""});rerender();$("#lmsg").textContent=`${o.visits.length} previous visit(s) loaded.`}catch(e){$("#lmsg").textContent="Could not read that code: "+e.message}};
@@ -384,7 +416,7 @@ function rGate(){const g=S.gate;
  shell("Language gate","Decides whether verbal items are given or switched to pointing.",`
  <h3>One-step command</h3>${say("close_eyes")}
  <div class="row"><button class="okb ${g.cmd===1?"sel":""}" data-g="cmd" data-v="1">Follows</button><button class="badb ${g.cmd===0?"sel":""}" data-g="cmd" data-v="0">Does not follow</button></div>
- <h3>Speech output</h3><p class="note">Ask the patient to name two objects in the room. Judge from that and the conversation so far.</p>
+ <h3>Speech output</h3><p class="note">Ask the patient to name two objects in the room. Judge from that and the conversation so far. Adequate: speaks in sentences a stranger would understand. Limited but usable: words or short phrases you can understand, even with effort. None: no words, or nothing you can make out (verbal tasks switch to pointing).</p>
  <div class="row">${[["fluent","Adequate"],["limited","Limited but usable"],["none","None or unintelligible"]].map(([k,l])=>`<button class="${g.speech===k?"sel":""}" data-g="speech" data-v="${k}">${l}</button>`).join("")}</div>
  <h3>Hand used for the screen</h3>
  <div class="row">${[["R","Right"],["L","Left"]].map(([k,l])=>`<button class="${g.hand===k?"sel":""}" data-g="hand" data-v="${k}">${l}</button>`).join("")}</div>
@@ -781,7 +813,13 @@ function rEveryday(){const E=S.ev,co=S.p.lit==="no";E.coins=co;const notes=co?[2
 }
 
 /* 13 mRS */
-function rMrs(){shell("Modified Rankin Scale","Rate current function. A structured interview is recommended.",MRS.map((l,i)=>`<div class="row"><button class="${S.mrs===i?"sel":""}" data-m="${i}" style="text-align:left;width:100%">${l}</button></div>`).join(""));
+function rMrs(){shell("Modified Rankin Scale","Rate current function. A structured interview is recommended.",`<details class="note" style="margin-bottom:10px"><summary style="cursor:pointer">How to decide (ask in this order)</summary><ol style="padding-left:20px;margin:6px 0">
+ <li>Bedridden, incontinent, needs care day and night? Yes = 5.</li>
+ <li>Needs another person to walk, or for toilet, bathing or dressing? Yes = 4. Sticks and walkers are allowed without another person.</li>
+ <li>Walks alone but needs help with shopping, cooking, money, travel or medicines? Yes = 3.</li>
+ <li>Manages alone but has given up some previous activity (work, household role, social life)? Yes = 2.</li>
+ <li>Has symptoms (weakness, speech, memory, mood) but does everything as before? Yes = 1. No symptoms = 0.</li></ol>
+ Rate the patient as they are now. Count only limits caused by the stroke, not by an older condition. Ask the informant when the patient's account is unreliable.</details>`+MRS.map((l,i)=>`<div class="row"><button class="${S.mrs===i?"sel":""}" data-m="${i}" style="text-align:left;width:100%">${l}</button></div>`).join(""));
  $$("[data-m]").forEach(b=>b.onclick=()=>{S.mrs=+b.dataset.m;rerender()})}
 
 /* 14 PHQ-9 */
@@ -873,7 +911,7 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
  if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect${v.ad==='none'?'. Layout was not shifted; if neglect is confirmed, set the shift by hand at the next visit and note that the layout changed':''}`,""]);
  if(S.p.vf==="lext"||S.p.vf==="rext")f.push([`Extinction on the ${S.p.vf==="lext"?"left":"right"} to double simultaneous stimulation: review for neglect`,""]);
  if(v.lbd!=null&&Math.abs(v.lbd)>=15)f.push([`Line bisection deviates ${v.lbd}% of the half-line: review for neglect (provisional threshold)`,""]);
- if(isPhone())f.push(["Phone-size screen",""]);if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
+ if(isPhone())f.push(["Phone-size screen",""]);if(S.intr)f.push(["Session interrupted or patient fatigued",""]);{const tq=timepoint();if(tq&&tq.lab==="Unscheduled")f.push([`Outside the scheduled windows (day ${tq.d})`,""])}if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
  if(v.dm!=null&&v.dm<delayTarget())f.push([`Delayed recall given after only ${v.dm} minutes`,""]);
  if(S.phq[8]>0)f.push(["PHQ-9 item 9 positive: act on local suicide-risk protocol","red"]);
  if(S.inf.mode==="b"&&v.inf!=null&&v.inf>=3)f.push(["Informant reports decline before the stroke: possible pre-existing impairment",""]);
@@ -931,7 +969,9 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  <p class="note">The raw scores above are the record. The provisional scores are a convenience and will be replaced by age- and education-adjusted scores once normative data exist. Interpret against years of education. Process measures (slope, intrusions, search organisation, reaction time variability, fluency time course) are research outputs.</p>
  ${Object.keys(S.idx).length?`<h3>Index event</h3><p class="note">${Object.keys(S.idx).length} procedure and imaging fields recorded${fpe()!=null?`; first-pass effect ${fpe()?"yes":"no"}`:""}. Included in the study export and the device log, not in the visit code.</p>`:""}
  ${Object.keys(S.photos||{}).length?`<h3>Drawing photos</h3><div class="row">${Object.values(S.photos).map(u=>`<img class="thumb" src="${u}" alt="">`).join("")}</div><div class="row"><button id="phs" class="pri">Save drawing photos</button><span class="note" id="phmsg">${S.took&&S.took.photos?"Saved.":"Not saved yet. They are cleared with the session."}</span></div>`:""}
- <h3>Visit code for the next visit</h3><p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
+ <h3>About this session</h3><div class="row"><button class="small ${S.intr?"sel":""}" id="intr">${S.intr?"Interrupted or patient fatigued: yes":"Mark: interrupted or patient fatigued"}</button></div>
+ <label style="margin-top:6px">Examiner notes (no names or other identifiers)</label><textarea id="enote" rows="2" placeholder="e.g. patient anxious; family member in the room for orientation">${esc(S.note||"")}</textarea>
+ <h3>Visit code for the next visit</h3>${(()=>{const nv=nextVisit();return nv?`<p><b>Next visit:</b> ${nv.lab}, between ${fmtD(nv.a)} and ${fmtD(nv.b)}</p>`:""})()}<p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>
  <h3>Export for the study sheet</h3>
  <div class="row"><button id="csv">Copy CSV</button><button id="json">Copy JSON</button><button id="new">New assessment</button><span class="note" id="cpmsg"></span></div>
@@ -949,12 +989,15 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
  const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",device_class:devClass(),gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
-  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{flags:f.map(x=>x[0]).join(" | ")});
+  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{interrupted:S.intr?1:0,examiner_note:S.note||"",duration_min:S.tt?Math.round(Object.entries(S.tt).filter(([k])=>k!=="setup"&&k!=="summary").reduce((a,[,x])=>a+x,0)/6)/10:""},Object.fromEntries(STEPS.map(x=>x[0]).filter(k=>k!=="setup"&&k!=="summary").map(k=>["t_"+k,S.tt&&S.tt[k]!=null?S.tt[k]:""])),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
  const cp=(txt,lab,onOk)=>{$("#out").value=txt;$("#out").select();const ok=()=>{$("#cpmsg").textContent=lab+" copied";if(onOk)onOk()},fail=()=>{$("#cpmsg").textContent=lab+" was NOT copied. Select the text in the box and copy it by hand."};const legacy=()=>{let r=false;try{r=document.execCommand("copy")}catch(_){}r?ok():fail()};try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,legacy);else legacy()}catch(e){legacy()}};
  const exported=(what)=>{S.took=Object.assign(S.took||{},{[what]:1});if(S.took.code&&S.took.data){S.exported=true;S.exportSnap=null;clearSaved();$("#savemsg").textContent="Visit code and results copied. The in-progress session is cleared; the results stay in this device's log."}else{save();$("#savemsg").textContent=S.took.code?"Visit code copied. Results are saved in this device's log; copy or download them too.":"Results copied. Now copy the visit code or show the QR to the family."}};
- $("#csv").onclick=()=>cp(csv,"CSV",()=>exported("data"));$("#json").onclick=()=>cp(JSON.stringify(flat,null,2),"JSON",()=>exported("data"));$("#cpv").onclick=()=>cp($("#vcode").textContent,"Visit code",()=>exported("code"));
+ /* notes are read again at copy time, so a note typed just before copying is not lost */
+ const refresh=()=>{flat.examiner_note=S.note||"";flat.interrupted=S.intr?1:0;const c=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));return c};
+ $("#csv").onclick=()=>cp(refresh(),"CSV",()=>exported("data"));$("#json").onclick=()=>{refresh();cp(JSON.stringify(flat,null,2),"JSON",()=>exported("data"))};$("#cpv").onclick=()=>cp($("#vcode").textContent,"Visit code",()=>exported("code"));
+ $("#intr").onclick=()=>{S.intr=!S.intr;rerender()};$("#enote").oninput=e=>{S.note=e.target.value;saveSoon()};
  if($("#phs"))$("#phs").onclick=async()=>{const nm=k=>`${(S.p.id||"noid").replace(/[^\w-]/g,"")}_${(v.tp||"visit").replace(/[^\w]+/g,"-")}_${v.dt}_form${v.f}_${k}.jpg`;
   const files=await Promise.all(Object.entries(S.photos).map(async([k,u])=>new File([await (await fetch(u)).blob()],nm(k),{type:"image/jpeg"})));
   const ok=()=>{S.took=Object.assign(S.took||{},{photos:1});save();$("#phmsg").textContent="Saved."};
@@ -967,7 +1010,7 @@ window.addEventListener("beforeunload",e=>{save();if(S.p.id){e.preventDefault();
  const age=Math.round((Date.now()-(sv.at||0))/60000);
  $("#app").innerHTML=`<div class="card"><h2>Unfinished assessment found</h2><p>Study ID <b>${esc(sv.S.p.id)||"(none)"}</b>, saved ${age} minute(s) ago at step ${sv.cur+1} (${esc(STEPS[sv.cur][1])}).${sv.cur===STEPS.length-1?" It reached the summary but the visit code and results were never copied.":""}</p>
  <div class="row"><button class="pri" id="rs">Resume</button><button id="ds">Discard and start new</button></div></div>`;
- $("#rs").onclick=()=>{S=Object.assign(fresh(),sv.S);try{S.photos=JSON.parse(localStorage.getItem(PHOTO_KEY)||"{}")}catch(e){S.photos={}}go(sv.cur)};
+ $("#rs").onclick=()=>{S=Object.assign(fresh(),sv.S);S._tIn=null;try{S.photos=JSON.parse(localStorage.getItem(PHOTO_KEY)||"{}")}catch(e){S.photos={}}go(sv.cur)};
  $("#ds").onclick=()=>{clearSaved();S=fresh();go(0)}})();
 </script>
 <script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!had||document.getElementById("upd"))return;const b=document.createElement("div");b.id="upd";b.style.cssText="position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#16324f;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:99;font-size:14px;display:flex;gap:10px;align-items:center";b.innerHTML=`A new version of StrokeSmriti is ready. Your session is saved. <button style="background:#f2a541;border:0;border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer">Reload</button>`;b.querySelector("button").onclick=()=>location.reload();document.body.appendChild(b)});window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").then(r=>r.update()).catch(()=>{}))}</script>
