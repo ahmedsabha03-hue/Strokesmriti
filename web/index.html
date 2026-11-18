@@ -99,7 +99,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.8.0";
+const VERSION="0.8.1";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -755,6 +755,21 @@ function rInf(){const I=S.inf;if(!I.mode)I.mode=infDefaultMode();const sc=infSco
  $("#ina").onclick=()=>{I.na=!I.na;rerender()};
 }
 
+/* ---------- provisional scores: percent of maximum, bounded tasks only. Not validated; no cut-offs. Raw scores stay the record. ---------- */
+const PROV=[["Memory",[["lt",24],["dr",8],["rcr",8]]],["Attention and orientation",[["or","orn"],["cn",20]]],["Executive",[["g1i",8],["g2i",6]]],["Language",[["nm",6],["cp",4]]],["Visuospatial",[["ck",3],["fc",2]]],["Everyday function",[["ev",4]]]];
+function provScores(v){if(!v)return null;const x=Object.assign({},v);
+ x.rcr=v.rh!=null&&v.rf!=null?Math.max(0,v.rh-v.rf):null;x.cn=v.cl!=null&&v.cr!=null?v.cl+v.cr:null;
+ x.g1i=v.g1c!=null?8-v.g1c:null;x.g2i=v.g2c!=null?6-v.g2c:null;
+ const dom=PROV.map(([name,parts])=>{const ok=parts.filter(([k,m])=>x[k]!=null&&(typeof m==="number"||x[m]));if(!ok.length)return[name,null];
+  const got=ok.reduce((a,[k])=>a+x[k],0),max=ok.reduce((a,[k,m])=>a+(typeof m==="number"?m:x[m]),0);return[name,Math.round(100*got/max)]});
+ const have=dom.filter(d=>d[1]!=null);const full=(v.md||"full")==="full";
+ const idx=full&&have.length>=4?Math.round(have.reduce((a,d)=>a+d[1],0)/have.length):null;return{dom,idx,n:have.length}}
+function provBlock(v,prev){const a=provScores(v),b=provScores(prev);
+ const cell=x=>x==null?"<span class='note'>not available</span>":x+"%";const ch=(p,q)=>p==null||q==null?"":(q-p>0?"+":"")+(q-p);
+ const rows=a.dom.map(([n,x],i)=>`<tr><td>${n}</td>${b?`<td class="n">${cell(b.dom[i][1])}</td>`:""}<td class="n">${cell(x)}</td>${b?`<td class="n">${ch(b.dom[i][1],x)}</td>`:""}</tr>`).join("");
+ return `<h3>Provisional scores</h3><p class="warn">Provisional. Not validated. No cut-off: do not call a score normal or abnormal. Percent of the maximum on tasks with a fixed maximum; digit span, pattern matching, fluency and reaction times wait for norms.</p>
+ <table><tr><th>Domain</th>${b?"<th>Last visit</th>":""}<th>This visit</th>${b?"<th>Change</th>":""}</tr>${rows}
+ <tr><td><b>Overall index</b> (mean of domains)</td>${b?`<td class="n">${cell(b.idx)}</td>`:""}<td class="n"><b>${a.idx==null?(v.md==="core"?"not given for the core battery":"needs at least 4 domains"):a.idx+"%"}</b></td>${b?`<td class="n">${ch(b.idx,a.idx)}</td>`:""}</tr></table>`}
 /* 16 summary */
 function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();const oK=["year","month","place","city"].filter(k=>o[k]===0||o[k]===1);
  const namK=NAMING.filter(k=>S.nam.res[k]===0||S.nam.res[k]===1),sc=infScore();
@@ -841,8 +856,9 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  ${f.length?`<div>${f.map(([t,c])=>`<span class="flag ${c}">${esc(t)}</span>`).join("")}</div>`:""}
  <table style="margin-top:8px"><tr><th>Measure</th>${prev?`<th>Last visit (${esc(prev.tp)})</th>`:""}<th>This visit</th>${prev?"<th>Change</th>":""}</tr>${rows}</table>
  ${prev?`<p class="note">Change is raw. Reliable change thresholds will come from test–retest data; treat small changes with caution.</p>`:""}
+ ${provBlock(v,prev)}
  <h3>Domains</h3><table><tr><th>Domain</th><th>Tasks</th></tr>${doms.map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</table>
- <p class="note">Raw scores only. No composite and no cutoffs until normative and validation data exist. Interpret against years of education. Process measures (slope, intrusions, search organisation, reaction time variability, fluency time course) are research outputs.</p>
+ <p class="note">The raw scores above are the record. The provisional scores are a convenience and will be replaced by age- and education-adjusted scores once normative data exist. Interpret against years of education. Process measures (slope, intrusions, search organisation, reaction time variability, fluency time course) are research outputs.</p>
  ${Object.keys(S.idx).length?`<h3>Index event</h3><p class="note">${Object.keys(S.idx).length} procedure and imaging fields recorded${fpe()!=null?`; first-pass effect ${fpe()?"yes":"no"}`:""}. Included in the study export and the device log, not in the visit code.</p>`:""}
  <h3>Visit code for the next visit</h3><p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>
@@ -862,7 +878,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
  const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
-  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),{flags:f.map(x=>x[0]).join(" | ")});
+  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
  const cp=(txt,lab,onOk)=>{$("#out").value=txt;$("#out").select();const ok=()=>{$("#cpmsg").textContent=lab+" copied";if(onOk)onOk()},fail=()=>{$("#cpmsg").textContent=lab+" was NOT copied. Select the text in the box and copy it by hand."};const legacy=()=>{let r=false;try{r=document.execCommand("copy")}catch(_){}r?ok():fail()};try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,legacy);else legacy()}catch(e){legacy()}};
