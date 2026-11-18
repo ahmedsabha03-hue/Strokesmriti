@@ -26,7 +26,7 @@ In-app purchases: No
 Target audience: 18 and over (clinicians)
 
 Data safety form answers:
-- Does the app collect or share any of the required user data types? No
+- Does the app collect or share any of the required user data types? No. Drawing photos are taken by the examiner, stay on the device and are shared only by the examiner, so under Google's definitions they are not collected by the app. If the review asks, answer: photos are processed on the device only, never transmitted by the app.
 - Is all user data encrypted in transit? Not applicable, no data is transmitted
 - Can users request data deletion? Not applicable, no data leaves the device
 
