@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.0";
+const VERSION="0.9.1";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -256,7 +256,10 @@ function interpNote(){const id=STEPS[cur][0];if(!SPOKEN_STEPS[id]||S.p.exl!=="no
 function say(k){const t=T[k],main=t[L()]||t.en;return `<div class="say">${spkBtn(k)}${esc(main)}${pending(k)?`<span class="pend">translation pending; read in patient's language</span>`:""}${L()!=="en"&&!pending(k)?`<span class="en">${esc(t.en)}</span>`:""}</div>`}
 function nm(k){const o=P[k],a=(o.acc&&o.acc[L()])||[];return (L()!=="en"&&o[L()])?`${o[L()]}${a.length?" (also "+a.join(", ")+")":""} · ${o.en}`:o.en}
 function pointingMode(){return S.gate.speech==="none"}
-function isPhone(){return Math.min(screen.width,screen.height)<600}
+/* device class: no touch input means a computer, whatever the screen size */
+function hasTouch(){try{return navigator.maxTouchPoints>0||matchMedia("(pointer:coarse)").matches}catch(e){return false}}
+function devClass(){if(!hasTouch())return"computer";return Math.min(screen.width,screen.height)<600?"phone":"tablet"}
+function isPhone(){return devClass()==="phone"}
 function isCtl(){return S.p.ptype==="control"}
 /* healthy controls: sessions, not days since stroke. Session number comes from the loaded visit code unless the examiner overrides it */
 function ctlSess(){const o=+S.p.csess;if(o>=1&&o<=3)return o;return S.prev&&S.prev.visits?S.prev.visits.length+1:1}
@@ -356,7 +359,7 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <div><label>Vision and hearing adequate</label><select data-k="sens">${opt([["","Select"],["yes","Yes"],["vision","Vision limited"],["hearing","Hearing limited"],["both","Both limited"]],p.sens)}</select></div>
  <div><label>Test form</label><select data-k="formSet">${opt([["auto","Automatic by timepoint"],["A","Form A"],["B","Form B"],["C","Form C"]],p.formSet)}</select></div>
  <div><label>Examiner role</label><select data-k="exr">${opt([["","Select"],["neuro","Neurologist or neuroradiologist"],["psy","Psychiatrist or psychologist"],["res","Resident or fellow"],["nurse","Nurse"],["ra","Research staff"],["other","Other"]],p.exr)}</select></div>
- <div><label>Device</label><input value="${isPhone()?"Phone":"Tablet"} · ${S.device.w}×${S.device.h} px" disabled>${Math.min(screen.width,screen.height)<360?`<div class="warn">Screen below the 360 px minimum. Use a larger phone or a tablet.</div>`:""}</div>
+ <div><label>Device</label><input value="${{phone:"Phone",tablet:"Tablet",computer:"Computer, no touchscreen"}[devClass()]} · ${S.device.w}×${S.device.h} px" disabled>${devClass()==="computer"?`<div class="warn">No touchscreen detected. Use this only to look around or enter interview items; patient tasks need a phone or tablet.</div>`:""}${hasTouch()&&Math.min(screen.width,screen.height)<360?`<div class="warn">Screen below the 360 px minimum. Use a larger phone or a tablet.</div>`:""}</div>
  </div><p class="note" id="tp">${tpText()}</p>`);
  $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
  $$("[data-pt]").forEach(b=>b.onclick=()=>{S.p.ptype=b.dataset.pt;if(isCtl()){S.p.vtype="follow";if(!S.p.purpose)S.p.purpose="norm";if(!S.p.cord&&ctlSess()===1)S.p.cord=nextOrder()}rerender()});
@@ -856,7 +859,7 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
  if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect`,""]);
  if(v.lbd!=null&&Math.abs(v.lbd)>=15)f.push([`Line bisection deviates ${v.lbd}% of the half-line: review for neglect (provisional threshold)`,""]);
- if(isPhone())f.push(["Phone-size screen",""]);
+ if(isPhone())f.push(["Phone-size screen",""]);if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
  if(v.dm!=null&&v.dm<delayTarget())f.push([`Delayed recall given after only ${v.dm} minutes`,""]);
  if(S.phq[8]>0)f.push(["PHQ-9 item 9 positive: act on local suicide-risk protocol","red"]);
  if(S.inf.mode==="b"&&v.inf!=null&&v.inf>=3)f.push(["Informant reports decline before the stroke: possible pre-existing impairment",""]);
@@ -931,7 +934,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
  packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
- const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",device_class:isPhone()?"phone":"tablet",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
+ const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",device_class:devClass(),gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
   Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
