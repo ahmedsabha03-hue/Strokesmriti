@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.5";
+const VERSION="0.9.6";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -354,7 +354,16 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <h3>This visit</h3><div class="grid2">
  ${isCtl()?"":`<div><label>Visit type</label><select data-k="vtype">${opt([["follow","Follow-up after stroke or treatment"],["pre","Pre-procedure baseline (elective carotid or intracranial)"],["post","Post-procedure, 24–72 h after elective procedure"]],p.vtype)}</select></div>`}
  <div><label>Battery</label><select data-k="mode">${opt([["full","Full (15–18 min)"],["core","Core (about 6 min)"]],p.mode)}</select></div>
- <div><label>Visual fields (confrontation)</label><select data-k="vf">${opt([["","Select"],["normal","Full"],["lhh","Left hemianopia"],["rhh","Right hemianopia"],["lq","Left quadrantanopia"],["rq","Right quadrantanopia"],["nt","Not tested"]],p.vf)}</select></div>
+ <div><label>Visual fields (confrontation)</label><select data-k="vf">${opt([["","Select"],["normal","Full"],["lhh","Left hemianopia"],["rhh","Right hemianopia"],["lq","Left quadrantanopia"],["rq","Right quadrantanopia"],["lext","Full fields, left extinction"],["rext","Full fields, right extinction"],["nt","Not tested"]],p.vf)}</select>
+ <details class="note" style="margin-top:6px"><summary style="cursor:pointer">How to test</summary>
+ <ol style="padding-left:20px;margin:6px 0">
+ <li>Sit facing the patient about 1 metre apart, eyes level. Ask them to look at your nose throughout; a trial where they glance at your hand does not count.</li>
+ <li>Test one eye at a time: the patient covers one eye, you close your opposite eye.</li>
+ <li>Hold your hand halfway between you in each quadrant in turn and briefly show 1, 2 or 5 fingers. Ask how many. Aphasic patient: wiggle a finger and ask them to point to the hand that moved.</li>
+ <li>Repeat with the other eye.</li>
+ <li>Then wiggle fingers on both sides at once. Seen alone on each side but missed on one side when both move = extinction (neglect, not field loss).</li>
+ </ol>
+ Both quadrants on one side missed in both eyes = hemianopia; one quadrant = quadrantanopia. A defect in one eye only is an eye problem: enter Full and note it. Cannot fixate or follow = Not tested.</details></div>
  <div><label>Layout adaptation</label><select data-k="adapt">${opt([["auto","Automatic (field defect, or neglect on cancellation)"],["none","Off"],["left","Shift right (left-sided deficit)"],["right","Shift left (right-sided deficit)"]],p.adapt)}</select></div>
  <div><label>Assessment date</label><input type="date" data-k="assessDate" value="${esc(p.assessDate)}"></div>
  <div><label>Do you speak the patient's language?</label><select data-k="exl">${opt([["","Select"],["yes","Yes"],["int","No, an interpreter is helping"],["no_int","No, and no interpreter"]],p.exl||"")}</select><div class="note">The speaker button reads each instruction aloud in the patient's language.</div></div>
@@ -863,6 +872,7 @@ const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Lea
 function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absent)",""]);if(S.p.lit==="no"&&pointingMode())f.push(["Non-literate patient in pointing mode: orientation choices are written numbers and month names",""]);if(S.p.lit==="no"&&v.ev!=null)f.push(["Non-literate patient: coins and notes show printed numerals; read money scores with caution",""]);if(v.vs)f.push(["Device voice gave instructions for: "+v.vs.split("|").join(", "),""]);if(v.ex==="int")f.push(["Examiner did not speak the patient's language; interpreter used for spoken answers",""]);if(v.ex==="no_int")f.push(["Examiner did not speak the patient's language and had no interpreter: spoken-answer tasks may be unreliable",""]);if(S.gate.cmd===0)f.push(["Comprehension limited: interpret all scores with caution",""]);
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
  if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect`,""]);
+ if(S.p.vf==="lext"||S.p.vf==="rext")f.push([`Extinction on the ${S.p.vf==="lext"?"left":"right"} to double simultaneous stimulation: review for neglect`,""]);
  if(v.lbd!=null&&Math.abs(v.lbd)>=15)f.push([`Line bisection deviates ${v.lbd}% of the half-line: review for neglect (provisional threshold)`,""]);
  if(isPhone())f.push(["Phone-size screen",""]);if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
  if(v.dm!=null&&v.dm<delayTarget())f.push([`Delayed recall given after only ${v.dm} minutes`,""]);
