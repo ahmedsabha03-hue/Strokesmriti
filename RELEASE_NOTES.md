@@ -6,4 +6,6 @@ Since v0.9.7: help for student examiners (plain-language "What is this?" notes, 
 
 v1.0.0: practice mode makes no visit code or QR, so a practice session can never be loaded as a prior visit. Pseudonymous examiner ID and examiner certification status (two supervised practice sessions) are recorded in the export, with a flag for uncertified examiners. Examiner notes carry a no-names prompt and are covered in the privacy policy.
 
+v1.0.1: bug fix only. In practice mode, the message after copying results no longer says a visit code was copied or that results were saved to the device log. No change to tasks, scoring or data.
+
 Data from v0.7.x and v0.9.x or later cannot be pooled: cancellation and naming items changed.
