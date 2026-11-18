@@ -99,7 +99,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.7.6";
+const VERSION="0.8.0";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -206,7 +206,7 @@ function em(e){const u=IMG[e];return u?`<img class="emi" src="${u}" alt="">`:`<s
 /* ---------- state ---------- */
 let S;
 function fresh(){const today=localISO(new Date());return{
- p:{lang:"en",assessDate:today,formSet:"auto",setting:"hospital",vtype:"follow",mode:"full",vf:"",adapt:"auto"},prev:null,gate:{},orient:{},
+ p:{ptype:"patient",lang:"en",assessDate:today,formSet:"auto",setting:"hospital",vtype:"follow",mode:"full",vf:"",adapt:"auto"},prev:null,gate:{},orient:{},
  mem:{phase:"show",trial:1,rec:[[],[],[]],encEnd:null,delayed:[],recog:[],delayedMin:null,showNames:false,intr:[0,0,0],dlDone:false,rgDone:false,dlNA:false,rgNA:false},
  ds:{fwd:{L:3,trial:1,res:[],longest:0,done:false,na:false},bwd:{L:2,trial:1,res:[],longest:0,done:false,na:false}},
  can:{done:false,na:false},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
@@ -252,14 +252,21 @@ function interpNote(){const id=STEPS[cur][0];if(!SPOKEN_STEPS[id]||S.p.exl!=="no
 function say(k){const t=T[k],main=t[L()]||t.en;return `<div class="say">${spkBtn(k)}${esc(main)}${pending(k)?`<span class="pend">translation pending; read in patient's language</span>`:""}${L()!=="en"&&!pending(k)?`<span class="en">${esc(t.en)}</span>`:""}</div>`}
 function nm(k){const o=P[k],a=(o.acc&&o.acc[L()])||[];return (L()!=="en"&&o[L()])?`${o[L()]}${a.length?" (also "+a.join(", ")+")":""} · ${o.en}`:o.en}
 function pointingMode(){return S.gate.speech==="none"}
-function timepoint(){const a=S.p.assessDate,i=S.p.intervDate||S.p.strokeDate;if(!a||!i)return null;const d=Math.round((parseLocal(a)-parseLocal(i))/864e5);let lab;
+function isCtl(){return S.p.ptype==="control"}
+/* healthy controls: sessions, not days since stroke. Session number comes from the loaded visit code unless the examiner overrides it */
+function ctlSess(){const o=+S.p.csess;if(o>=1&&o<=3)return o;return S.prev&&S.prev.visits?S.prev.visits.length+1:1}
+const ORDERS=["ABC","BCA","CAB","ACB","BAC","CBA"];
+/* next counterbalancing order: the one least used for session 1 controls in this device's log */
+function nextOrder(){const c=Object.fromEntries(ORDERS.map(o=>[o,0]));readLog().forEach(r=>{if(r.pt_ptype==="control"&&String(r.cs)==="1"&&c[r.pt_cord]!=null)c[r.pt_cord]++});return ORDERS.reduce((a,o)=>c[o]<c[a]?o:a,ORDERS[0])}
+function ctlForm(){const o=S.p.cord||"ABC",pu=S.p.purpose||"norm";if(pu==="retest")return o[0];const k=Math.min(ctlSess(),3)-1;return pu==="equiv"?o[k]:o[0]}
+function timepoint(){if(isCtl()){const a=S.p.assessDate,i=S.p.c1date||S.p.assessDate;if(!a)return null;const d=Math.round((parseLocal(a)-parseLocal(i))/864e5);return{d,lab:d<0?"Invalid: session before session 1":"Control session "+ctlSess()}}const a=S.p.assessDate,i=S.p.intervDate||S.p.strokeDate;if(!a||!i)return null;const d=Math.round((parseLocal(a)-parseLocal(i))/864e5);let lab;
  if(S.p.vtype==="pre")return{d,lab:d<=0?"Pre-procedure":"Invalid: pre-procedure visit after the procedure date"};
  if(S.p.vtype==="post")return{d,lab:d>=0&&d<=3?"Post-procedure (24–72 h)":d<0?"Invalid: post-procedure visit before the procedure date":"Post-procedure (day "+d+")"};
  if(d<0)lab="Invalid: assessment before index date";else if(d<=10)lab="Acute / discharge";else if(d>=23&&d<=37)lab="30 days";else if(d>=75&&d<=105)lab="90 days";else if(d>=150&&d<=210)lab="6 months";else if(d>=330&&d<=400)lab="12 months";else lab="Unscheduled";return{d,lab}}
 function elective(){return["CAS","CEA","ICAS"].includes(S.p.interv)}
 /* protocol: stroke = discharge (A), 90 days (B), 12 months (C); elective = pre-procedure (A), 24–72 h (B), 30 days (C). Other visits are optional and reuse a form. */
-function autoForm(lab){if(lab&&lab.startsWith("Post-procedure"))return"B";const m=elective()?{"Pre-procedure":"A","30 days":"C","90 days":"A","6 months":"A","12 months":"A"}:{"Acute / discharge":"A","90 days":"B","12 months":"C","30 days":"C","6 months":"A"};return m[lab]||"A"}
-function optionalVisit(lab){return elective()?["90 days","6 months","12 months","Acute / discharge"].includes(lab):["30 days","6 months"].includes(lab)}
+function autoForm(lab){if(isCtl())return ctlForm();if(lab&&lab.startsWith("Post-procedure"))return"B";const m=elective()?{"Pre-procedure":"A","30 days":"C","90 days":"A","6 months":"A","12 months":"A"}:{"Acute / discharge":"A","90 days":"B","12 months":"C","30 days":"C","6 months":"A"};return m[lab]||"A"}
+function optionalVisit(lab){if(isCtl())return false;return elective()?["90 days","6 months","12 months","Acute / discharge"].includes(lab):["30 days","6 months"].includes(lab)}
 function form(){return S.p.formSet&&S.p.formSet!=="auto"?S.p.formSet:autoForm((timepoint()||{}).lab)}
 
 /* ---------- visit code (longitudinal record carried by the patient) ---------- */
@@ -277,7 +284,7 @@ const STEPS=[
  ["mrs","Modified Rankin Scale",rMrs],["phq","PHQ-9",rPhq],["inf","Informant questions",rInf],["delayed","Delayed recall and recognition",rDelayed],["summary","Summary",rSummary]];
 /* core battery (about 6 minutes of patient time): for post-procedure visits and busy OPDs. mRS and informant questions fill the recall delay. */
 const CORE=new Set(["setup","idx","gate","orient","learn","cancel","sym","mrs","inf","delayed","summary"]);
-function stepOn(i){return S.p.mode!=="core"||CORE.has(STEPS[i][0])}
+function stepOn(i){const id=STEPS[i][0];if(isCtl()&&(id==="idx"||id==="inf"))return false;return S.p.mode!=="core"||CORE.has(id)}
 function delayTarget(){return S.p.mode==="core"?5:10}
 let cur=0;
 /* ---------- autosave: the session survives a tab crash, an accidental back-swipe or Android tab eviction. Cleared by "New assessment". ---------- */
@@ -296,28 +303,45 @@ function rerender(){STEPS[cur][2]();syncHLang();save()}
 function okBad(id,val){return `<button class="okb ${val===1?"sel":""}" data-id="${id}" data-v="1">Correct</button><button class="badb ${val===0?"sel":""}" data-id="${id}" data-v="0">Incorrect</button>`}
 
 /* 1 setup */
-function tpText(){const t=timepoint();return t?`${t.d<0?`${-t.d} day(s) before the procedure`:`Day ${t.d} after index date`} · timepoint: <b>${t.lab}</b>${optionalVisit(t.lab)?" (optional visit; form reused)":""} · form ${form()}`:"Enter intervention (or stroke) date and assessment date to set the timepoint."}
+function tpText(){const t=timepoint();if(isCtl())return t?`${t.lab}${ctlSess()>1?` · day ${t.d} after session 1`:""} · order ${S.p.cord||"not set"} · form ${form()}`:"Enter the assessment date.";return t?`${t.d<0?`${-t.d} day(s) before the procedure`:`Day ${t.d} after index date`} · timepoint: <b>${t.lab}</b>${optionalVisit(t.lab)?" (optional visit; form reused)":""} · form ${form()}`:"Enter intervention (or stroke) date and assessment date to set the timepoint."}
+/* healthy-control block: purpose, counterbalancing order, session, eligibility, vascular risk */
+const CEX=[["ce_stroke","Stroke or TIA"],["ce_dem","Dementia, or a memory complaint the person or family is worried about"],["ce_neuro","Other neurological disease (epilepsy, Parkinson's, multiple sclerosis, brain tumour)"],["ce_tbi","Head injury with loss of consciousness"],["ce_psy","Major psychiatric illness (psychosis, bipolar disorder, current severe depression)"],["ce_sub","Alcohol or drug dependence, or sedating medicines in the last week"],["ce_sens","Vision or hearing too poor for the tasks"]];
+const CRF=[["rf_htn","Hypertension"],["rf_dm","Diabetes"],["rf_lip","High cholesterol"],["rf_cad","Heart disease or atrial fibrillation"]];
+function ctlExcluded(){return CEX.some(([k])=>S.p[k]==="yes")}
+function ctlBlock(p,opt){const yn=k=>`<select data-k="${k}">${opt([["","Select"],["no","No"],["yes","Yes"]],p[k]||"")}</select>`;
+ return `<div class="grid2">
+ <div><label>Study purpose</label><select data-k="purpose">${opt([["norm","Normative (one session)"],["equiv","Form equivalence (three sessions, one per form)"],["retest","Test–retest (same form twice)"]],p.purpose||"norm")}</select></div>
+ <div><label>Form order</label><select data-k="cord">${opt([["","Select"],...ORDERS.map(o=>[o,o.split("").join(" → ")])],p.cord||"")}</select><div class="note">Set at session 1 and carried in the visit code. Suggested next order on this device: ${nextOrder()}.</div></div>
+ <div><label>Session</label><select data-k="csess">${opt([["","Automatic ("+ctlSess()+")"],["1","Session 1"],["2","Session 2"],["3","Session 3"]],p.csess||"")}</select></div>
+ <div><label>Recruited as</label><select data-k="csrc">${opt([["","Select"],["relative","Relative or carer of a patient"],["staff","Hospital staff"],["community","Community volunteer"],["other","Other"]],p.csrc||"")}</select></div>
+ </div>
+ <h3>Eligibility: does the person have any of these?</h3>${CEX.map(([k,l])=>`<div class="item"><div style="flex:1 1 260px">${l}</div>${yn(k)}</div>`).join("")}
+ ${ctlExcluded()?`<p class="flag red">Not eligible as a healthy control.</p>`:""}
+ <h3>Vascular risk</h3><div class="grid2">${CRF.map(([k,l])=>`<div><label>${l}</label>${yn(k)}</div>`).join("")}
+ <div><label>Smoking</label><select data-k="rf_smk">${opt([["","Select"],["never","Never"],["former","Former"],["current","Current"]],p.rf_smk||"")}</select></div></div>`}
 function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${v===k?"selected":""}>${l}</option>`).join("");
  const prevList=S.prev?`<table><tr><th>Previous visit</th><th>Timepoint</th><th>Form</th></tr>${S.prev.visits.map(v=>`<tr><td>${v.dt?esc(v.dt):(v.d!=null?"Day "+v.d:"")}</td><td>${esc(v.tp)}</td><td>${esc(v.f)}</td></tr>`).join("")}</table>`:"";
  shell("Patient and session","Use a study ID only. Do not enter the patient's name.",`
  <h3>Follow-up visit?</h3><p class="note">Paste the visit code from the patient's last assessment. It fills in the details below and shows change since last time.</p>
  <div class="row"><textarea id="pcode" rows="2" placeholder="PSC2..."></textarea></div><div class="row"><button id="load">Load previous visits</button><button id="scan" style="display:none">Scan QR with camera</button><span class="note" id="lmsg"></span></div>${prevList}
- <h3>Patient</h3><div class="grid2">
+ <h3>Participant</h3><div class="row">${[["patient","Stroke patient"],["control","Healthy control"]].map(([k,l])=>`<button class="${(p.ptype||"patient")===k?"sel":""}" data-pt="${k}">${l}</button>`).join("")}</div>
+ ${isCtl()?ctlBlock(p,opt):""}
+ <h3>${isCtl()?"Control":"Patient"}</h3><div class="grid2">
  <div><label>Study ID</label><input data-k="id" value="${esc(p.id)}"></div>
- <div><label>Patient language</label><select data-k="lang">${opt(LANGS,p.lang)}</select>${LSTATUS[p.lang]?`<div class="note">Translation status: ${LSTATUS[p.lang]}. English shown below each line.</div>`:""}</div>
- <div><label>Age at stroke (years)</label><input type="number" data-k="age" value="${esc(p.age)}"></div>
+ <div><label>${isCtl()?"Language":"Patient language"}</label><select data-k="lang">${opt(LANGS,p.lang)}</select>${LSTATUS[p.lang]?`<div class="note">Translation status: ${LSTATUS[p.lang]}. English shown below each line.</div>`:""}</div>
+ <div><label>${isCtl()?"Age (years)":"Age at stroke (years)"}</label><input type="number" data-k="age" value="${esc(p.age)}"></div>
  <div><label>Sex</label><select data-k="sex">${opt([["","Select"],["F","Female"],["M","Male"],["O","Other"]],p.sex)}</select></div>
  <div><label>Years of formal education</label><input type="number" data-k="edu" value="${esc(p.edu)}"></div>
  <div><label>Can read and write</label><select data-k="lit">${opt([["","Select"],["yes","Yes"],["no","No"]],p.lit)}</select></div>
- <div><label>Handedness before stroke</label><select data-k="hand">${opt([["","Select"],["R","Right"],["L","Left"],["A","Ambidextrous"]],p.hand)}</select></div>
- <div><label>Lesion side</label><select data-k="side">${opt([["","Select"],["L","Left hemisphere"],["R","Right hemisphere"],["B","Bilateral"],["P","Posterior circulation"],["U","Unknown"]],p.side)}</select></div>
+ <div><label>${isCtl()?"Handedness":"Handedness before stroke"}</label><select data-k="hand">${opt([["","Select"],["R","Right"],["L","Left"],["A","Ambidextrous"]],p.hand)}</select></div>
+ ${isCtl()?"":`<div><label>Lesion side</label><select data-k="side">${opt([["","Select"],["L","Left hemisphere"],["R","Right hemisphere"],["B","Bilateral"],["P","Posterior circulation"],["U","Unknown"]],p.side)}</select></div>
  <div><label>Stroke onset date</label><input type="date" data-k="strokeDate" value="${esc(p.strokeDate)}"></div>
  <div><label>Intervention</label><select data-k="interv">${opt([["","Select"],["IVT","IV thrombolysis"],["EVT","Thrombectomy"],["IVT+EVT","Thrombolysis + thrombectomy"],["CAS","Carotid stenting"],["CEA","Carotid endarterectomy"],["ICAS","Intracranial stenting or angioplasty"],["none","No reperfusion therapy"],["other","Other"]],p.interv)}</select></div>
  <div><label>Intervention date (planned date for a pre-procedure visit)</label><input type="date" data-k="intervDate" value="${esc(p.intervDate)}"></div>
- <div><label>Admission NIHSS</label><input type="number" data-k="nihss" value="${esc(p.nihss)}"></div>
+ <div><label>Admission NIHSS</label><input type="number" data-k="nihss" value="${esc(p.nihss)}"></div>`}
  </div>
  <h3>This visit</h3><div class="grid2">
- <div><label>Visit type</label><select data-k="vtype">${opt([["follow","Follow-up after stroke or treatment"],["pre","Pre-procedure baseline (elective carotid or intracranial)"],["post","Post-procedure, 24–72 h after elective procedure"]],p.vtype)}</select></div>
+ ${isCtl()?"":`<div><label>Visit type</label><select data-k="vtype">${opt([["follow","Follow-up after stroke or treatment"],["pre","Pre-procedure baseline (elective carotid or intracranial)"],["post","Post-procedure, 24–72 h after elective procedure"]],p.vtype)}</select></div>`}
  <div><label>Battery</label><select data-k="mode">${opt([["full","Full (15–18 min)"],["core","Core (about 6 min)"]],p.mode)}</select></div>
  <div><label>Visual fields (confrontation)</label><select data-k="vf">${opt([["","Select"],["normal","Full"],["lhh","Left hemianopia"],["rhh","Right hemianopia"],["lq","Left quadrantanopia"],["rq","Right quadrantanopia"],["nt","Not tested"]],p.vf)}</select></div>
  <div><label>Layout adaptation</label><select data-k="adapt">${opt([["auto","Automatic (field defect, or neglect on cancellation)"],["none","Off"],["left","Shift right (left-sided deficit)"],["right","Shift left (right-sided deficit)"]],p.adapt)}</select></div>
@@ -329,9 +353,10 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <div><label>Examiner role</label><select data-k="exr">${opt([["","Select"],["neuro","Neurologist or neuroradiologist"],["psy","Psychiatrist or psychologist"],["res","Resident or fellow"],["nurse","Nurse"],["ra","Research staff"],["other","Other"]],p.exr)}</select></div>
  <div><label>Device</label><input value="${S.device.w}×${S.device.h} px" disabled></div>
  </div><p class="note" id="tp">${tpText()}</p>`);
- $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(k==="vtype"||k==="mode"||k==="interv"||k==="lang")rerender();else saveSoon()});
+ $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
+ $$("[data-pt]").forEach(b=>b.onclick=()=>{S.p.ptype=b.dataset.pt;if(isCtl()){S.p.vtype="follow";if(!S.p.purpose)S.p.purpose="norm";if(!S.p.cord&&ctlSess()===1)S.p.cord=nextOrder()}rerender()});
  if("BarcodeDetector" in window&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){$("#scan").style.display="";$("#scan").onclick=()=>scanQR(t=>{$("#pcode").value=t;$("#load").click()})}
- $("#load").onclick=async()=>{try{const o=await unpackCode($("#pcode").value);S.prev=o;const {idx,...dm}=o.demo;S.idx=Object.assign({},idx||{});Object.assign(S.p,dm,{assessDate:S.p.assessDate,formSet:"auto",vtype:S.p.vtype,mode:S.p.mode});rerender();$("#lmsg").textContent=`${o.visits.length} previous visit(s) loaded.`}catch(e){$("#lmsg").textContent="Could not read that code: "+e.message}};
+ $("#load").onclick=async()=>{try{const o=await unpackCode($("#pcode").value);S.prev=o;const {idx,...dm}=o.demo;S.idx=Object.assign({},idx||{});Object.assign(S.p,dm,{assessDate:S.p.assessDate,formSet:"auto",vtype:S.p.vtype,mode:S.p.mode,csess:""});rerender();$("#lmsg").textContent=`${o.visits.length} previous visit(s) loaded.`}catch(e){$("#lmsg").textContent="Could not read that code: "+e.message}};
 }
 
 /* 2 gate */
@@ -749,7 +774,7 @@ function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();
   nm:namK.length===NAMING.length?namK.reduce((a,k)=>a+S.nam.res[k],0):null,cp:S.comp.idx>=COMP.length?S.comp.res.filter(x=>x).length:null,
   fl:S.flu.done&&!S.flu.na?S.flu.count:null,flr:S.flu.done&&!S.flu.na?S.flu.rep:null,
   ck:S.vis.clockNA||!S.vis.clockDone?null:(S.vis.clock.c?1:0)+(S.vis.clock.n?1:0)+(S.vis.clock.h?1:0),fc:S.vis.copyNA?null:n(S.vis.copy),
-  vt:S.p.vtype||"follow",md:S.p.mode||"full",vf:S.p.vf||null,ad:adaptSide()||"none",orn:orAll?(o.city==="na"?3:4):null,
+  vt:isCtl()?"ctl":(S.p.vtype||"follow"),cs:isCtl()?ctlSess():null,md:S.p.mode||"full",vf:S.p.vf||null,ad:adaptSide()||"none",orn:orAll?(o.city==="na"?3:4):null,
   ls:M.phase==="done"?M.rec[2].length-M.rec[0].length:null,li:M.phase==="done"?(M.intr||[0,0,0]).reduce((a,b)=>a+b,0):null,
   csx:S.can.done?n(S.can.sx):null,cbr:S.can.done?n(S.can.br):null,cint:S.can.done?n(S.can.ints):null,crev:S.can.done?n(S.can.rev):null,crate:S.can.done?n(S.can.rate):null,
   evc:S.ev.coins?1:0,srcv:S.sym.done?n(S.sym.cv):null,g1cv:S.gng.b1?n(S.gng.b1.rtcv):null,fl15:S.flu.done&&!S.flu.na?(S.flu.ts||[]).filter(t=>t<=15000).length:null,ev:evScore(),
@@ -772,9 +797,15 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
  if(v.md==="core")f.push(["Core battery: compare only with core or full-battery scores of the same tasks",""]);
  if(v.ev!=null&&S.p.lit==="no")f.push(["Everyday tasks given in the coins-only version",""]);
  if(S.p.vtype==="post"&&!(S.prev&&S.prev.visits.some(x=>x.vt==="pre")))f.push(["Post-procedure visit without a loaded pre-procedure baseline",""]);
+ if(isCtl()){f.unshift(["Healthy control: "+({norm:"normative",equiv:"form equivalence",retest:"test–retest"}[S.p.purpose||"norm"])+(S.p.cord?", order "+S.p.cord:", order not set"),""]);
+  if(ctlExcluded())f.push(["Control meets an exclusion criterion: not eligible","red"]);
+  if(CEX.some(([k])=>!S.p[k]))f.push(["Control eligibility checklist incomplete",""]);
+  const tq=timepoint(),s=ctlSess();if(tq&&s>1){if(S.p.purpose==="retest"&&(tq.d<14||tq.d>28))f.push([`Retest given ${tq.d} days after session 1 (protocol 14–28)`,""]);if(S.p.purpose==="equiv"&&tq.d<7)f.push([`Session ${s} only ${tq.d} days after session 1 (protocol at least 7)`,""])}
+  if(S.p.purpose==="retest"&&s>2)f.push(["Test–retest has only two sessions","red"]);
+  if(S.p.formSet&&S.p.formSet!=="auto")f.push(["Form set by hand, not by the counterbalancing order",""])}
  const tp=timepoint();if(tp&&tp.lab.startsWith("Invalid"))f.push([tp.lab,"red"]);return f}
 /* ---------- study export: one fixed column set for every patient ---------- */
-function csvKeys(flat){const base=["tool_version",...["id","age","sex","edu","lit","hand","side","strokeDate","interv","intervDate","nihss","lang"].map(k=>"pt_"+k),"setting","sensory","examiner","gate_command","gate_speech","tablet_hand","device"];
+function csvKeys(flat){const base=["tool_version",...["id","ptype","age","sex","edu","lit","hand","side","strokeDate","interv","intervDate","nihss","lang","purpose","cord","c1date","csrc"].map(k=>"pt_"+k),...CEX.map(x=>x[0]),...CRF.map(x=>x[0]),"rf_smk","setting","sensory","examiner","gate_command","gate_speech","tablet_hand","device"];
  const idx=[];IDX.forEach(g=>g.f.forEach(([k])=>{const c="idx_"+k;if(!idx.includes(c))idx.push(c)}));idx.push("idx_fpe");
  const vr=Object.keys(visitRecord());const all=[...base,...idx,...vr,"flags"];Object.keys(flat).forEach(k=>{if(!all.includes(k))all.splice(all.length-1,0,k)});return all}
 const LOG_KEY="strokesmriti_log_v1";
@@ -820,7 +851,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  <textarea id="out" readonly style="height:110px;font:12px ui-monospace,monospace"></textarea>
  <p class="note" id="savemsg">Results are saved in this device's log automatically. The in-progress session clears once you copy both the visit code and the results.</p>
  <h3>Device log</h3><div id="logbox"></div>`);
- const demo={id:S.p.id||"",age:S.p.age||"",sex:S.p.sex||"",edu:S.p.edu||"",lit:S.p.lit||"",hand:S.p.hand||"",side:S.p.side||"",strokeDate:S.p.strokeDate||"",interv:S.p.interv||"",intervDate:S.p.intervDate||"",nihss:S.p.nihss||"",lang:S.p.lang};
+ const demo={id:S.p.id||"",ptype:S.p.ptype||"patient",age:S.p.age||"",sex:S.p.sex||"",edu:S.p.edu||"",lit:S.p.lit||"",hand:S.p.hand||"",side:S.p.side||"",strokeDate:S.p.strokeDate||"",interv:S.p.interv||"",intervDate:S.p.intervDate||"",nihss:S.p.nihss||"",lang:S.p.lang,...(isCtl()?{purpose:S.p.purpose||"norm",cord:S.p.cord||"",c1date:S.p.c1date||S.p.assessDate||"",csrc:S.p.csrc||""}:{})};
  /* the visit code is encoded, not encrypted: it carries only what the next visit needs. Visit dates become day offsets, NIHSS and index-event fields stay in the study export */
  const codeDemo=(()=>{const d=Object.assign({},demo);delete d.nihss;return d})();
  /* visit code: nulls dropped, PHQ-9 item 9 excluded (the slip travels with the family), and the baseline visit plus the three most recent kept so the QR stays scannable from print */
@@ -830,7 +861,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
  packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
- const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
+ const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
   Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
