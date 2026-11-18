@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.6";
+const VERSION="0.9.7";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -364,7 +364,7 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <li>Then wiggle fingers on both sides at once. Seen alone on each side but missed on one side when both move = extinction (neglect, not field loss).</li>
  </ol>
  Both quadrants on one side missed in both eyes = hemianopia; one quadrant = quadrantanopia. A defect in one eye only is an eye problem: enter Full and note it. Cannot fixate or follow = Not tested.</details></div>
- <div><label>Layout adaptation</label><select data-k="adapt">${opt([["auto","Automatic (field defect, or neglect on cancellation)"],["none","Off"],["left","Shift right (left-sided deficit)"],["right","Shift left (right-sided deficit)"]],p.adapt)}</select></div>
+ <div><label>Layout adaptation</label><select data-k="adapt">${opt([["auto","Automatic (from visual fields)"],["none","Off"],["left","Shift right (left-sided deficit)"],["right","Shift left (right-sided deficit)"]],p.adapt)}</select></div>
  <div><label>Assessment date</label><input type="date" data-k="assessDate" value="${esc(p.assessDate)}"></div>
  <div><label>Do you speak the patient's language?</label><select data-k="exl">${opt([["","Select"],["yes","Yes"],["int","No, an interpreter is helping"],["no_int","No, and no interpreter"]],p.exl||"")}</select><div class="note">The speaker button reads each instruction aloud in the patient's language.</div></div>
  <div><label>Setting</label><select data-k="setting">${opt([["hospital","Hospital or clinic"],["home","Patient's home"]],p.setting)}</select></div>
@@ -695,9 +695,8 @@ function searchMetrics(taps){if(!taps.length)return{};const h=taps.filter(t=>t.t
   const last=h[h.length-1].t;out.rate=last>0?+(h.length/(last/60000)).toFixed(1):null}
  if(h.length>=3){const o=h.map((_,k)=>k);out.br=+Math.max(Math.abs(corr(o,h.map(t=>t.x))),Math.abs(corr(o,h.map(t=>t.y)))).toFixed(2)}
  return out}
-/* side of the deficit: from the setup field, else from lateralised cancellation omissions. Cancellation itself is never shifted. */
-function adaptSide(){const a=S.p.adapt||"auto";if(a==="none")return null;if(a==="left"||a==="right")return a;if(S.prev&&S.prev.visits&&S.prev.visits.length&&"ad" in S.prev.visits[0])return S.prev.visits[0].ad==="none"?null:(S.prev.visits[0].ad||null);const vf=S.p.vf;if(vf==="lhh"||vf==="lq")return"left";if(vf==="rhh"||vf==="rq")return"right";
- if(S.can&&S.can.done){if(S.can.hitsR-S.can.hitsL>=3)return"left";if(S.can.hitsL-S.can.hitsR>=3)return"right"}return null}
+/* side of the deficit, fixed before any task: the baseline visit's setting, else the visual fields entered at setup. A lopsided cancellation result only raises a flag, so the layout never changes partway through a visit. Cancellation and bisection are never shifted. */
+function adaptSide(){const a=S.p.adapt||"auto";if(a==="none")return null;if(a==="left"||a==="right")return a;if(S.prev&&S.prev.visits&&S.prev.visits.length&&"ad" in S.prev.visits[0])return S.prev.visits[0].ad==="none"?null:(S.prev.visits[0].ad||null);const vf=S.p.vf;if(vf==="lhh"||vf==="lq")return"left";if(vf==="rhh"||vf==="rq")return"right";return null}
 
 /* ---------- index event: procedure and imaging (stroke) ---------- */
 const YN=["no","yes"],G03=["0","1","2","3"];
@@ -871,7 +870,7 @@ const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Lea
  ["ck","Clock","/3"],["fc","Figure copy","/2"],["ev","Everyday tasks","/4"],["mrs","mRS",""],["phq","PHQ-9",""],["inf","Informant mean (1–4)",""]];
 function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absent)",""]);if(S.p.lit==="no"&&pointingMode())f.push(["Non-literate patient in pointing mode: orientation choices are written numbers and month names",""]);if(S.p.lit==="no"&&v.ev!=null)f.push(["Non-literate patient: coins and notes show printed numerals; read money scores with caution",""]);if(v.vs)f.push(["Device voice gave instructions for: "+v.vs.split("|").join(", "),""]);if(v.ex==="int")f.push(["Examiner did not speak the patient's language; interpreter used for spoken answers",""]);if(v.ex==="no_int")f.push(["Examiner did not speak the patient's language and had no interpreter: spoken-answer tasks may be unreliable",""]);if(S.gate.cmd===0)f.push(["Comprehension limited: interpret all scores with caution",""]);
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
- if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect`,""]);
+ if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect${v.ad==='none'?'. Layout was not shifted; if neglect is confirmed, set the shift by hand at the next visit and note that the layout changed':''}`,""]);
  if(S.p.vf==="lext"||S.p.vf==="rext")f.push([`Extinction on the ${S.p.vf==="lext"?"left":"right"} to double simultaneous stimulation: review for neglect`,""]);
  if(v.lbd!=null&&Math.abs(v.lbd)>=15)f.push([`Line bisection deviates ${v.lbd}% of the half-line: review for neglect (provisional threshold)`,""]);
  if(isPhone())f.push(["Phone-size screen",""]);if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
