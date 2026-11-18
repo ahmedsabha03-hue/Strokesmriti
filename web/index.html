@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.2";
+const VERSION="0.9.3";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -815,7 +815,7 @@ function rInf(){const I=S.inf;if(!I.mode)I.mode=infDefaultMode();const sc=infSco
 /* ---------- provisional scores: percent of maximum, bounded tasks only. Not validated; no cut-offs. Raw scores stay the record. ---------- */
 const PROV=[["Memory",[["lt",24],["dr",8],["rcr",8]]],["Attention and orientation",[["or","orn"],["cn",16]]],["Executive",[["g1a",30],["g2a",20]]],["Language",[["nm",6],["cp",4]]],["Visuospatial",[["ck",3],["fc",2]]],["Everyday function",[["ev",4]]]];
 function provScores(v){if(!v)return null;const x=Object.assign({},v);
- x.rcr=v.rh!=null&&v.rf!=null?Math.max(0,v.rh-v.rf):null;x.cn=v.cl!=null&&v.cr!=null?v.cl+v.cr:null;
+ x.rcr=v.rh!=null&&v.rf!=null?Math.max(0,v.rh-v.rf):null;x.cn=v.cl!=null&&v.cr!=null?Math.min(16,v.cl+v.cr):null;/* capped: visits from before v0.9 used 10 targets per side */
  /* Go/No-Go accuracy: correct taps plus correct withholds over all trials. A patient who never taps gets 8/30 and 6/20, not full marks */
  x.g1a=v.g1h!=null&&v.g1c!=null?v.g1h+(8-v.g1c):null;x.g2a=v.g2h!=null&&v.g2c!=null?v.g2h+(6-v.g2c):null;
  const dom=PROV.map(([name,parts])=>{const ok=parts.filter(([k,m])=>x[k]!=null&&(typeof m==="number"||x[m]));if(!ok.length)return[name,null];
@@ -827,7 +827,7 @@ function provBlock(v,prev){const a=provScores(v),b=provScores(prev);
  const rows=a.dom.map(([n,x],i)=>`<tr><td>${n}</td>${b?`<td class="n">${cell(b.dom[i][1])}</td>`:""}<td class="n">${cell(x)}</td>${b?`<td class="n">${ch(b.dom[i][1],x)}</td>`:""}</tr>`).join("");
  return `<h3>Provisional scores</h3><p class="warn">Provisional. Not validated. No cut-off: do not call a score normal or abnormal. Percent of the maximum on tasks with a fixed maximum; digit span, pattern matching, fluency and reaction times wait for norms.</p>
  <table><tr><th>Domain</th>${b?"<th>Last visit</th>":""}<th>This visit</th>${b?"<th>Change</th>":""}</tr>${rows}
- <tr><td><b>Overall index</b> (mean of domains)</td>${b?`<td class="n">${cell(b.idx)}</td>`:""}<td class="n"><b>${a.idx==null?(v.md==="core"?"not given for the core battery":"needs at least 4 domains"):a.idx+"%"}</b></td>${b?`<td class="n">${ch(b.idx,a.idx)}</td>`:""}</tr></table>`}
+ </table><p class="note">An overall index is calculated in the export only (prov_index). It is not shown here until norms exist, because a single percentage would be read as a test score.</p>`}
 /* 16 summary */
 function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();const oK=["year","month","place","city"].filter(k=>o[k]===0||o[k]===1);
  const namK=NAMING.filter(k=>S.nam.res[k]===0||S.nam.res[k]===1),sc=infScore();
