@@ -42,6 +42,6 @@ Nothing leaves the device unless the examiner copies, downloads or shares it. Ea
 
 Study protocol requirements for sites:
 - Collect study data with the Android app. On the website the log sits in browser storage and "Clear browsing data" erases it.
-- Use tablets with a screen lock managed by the institution; the log holds many patients' records unencrypted.
-- Use one tablet model per site; reaction times and cancellation geometry depend on screen size and touch latency.
+- Use phones or tablets with a screen lock; the log holds many patients' records unencrypted.
+- Phones (at least 360 px wide) and tablets both work. Speed scores are reported minus each patient's simple reaction time on the same device, which removes most of the difference in touch delay between devices. The export records the device class and screen size; where possible use one device model per site.
 - Decide in advance whether instructions come from the examiner or the device voice, and keep to it. The export records, per task, where the device voice was used (`vs`) and the translation version (`tv`).

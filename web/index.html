@@ -29,7 +29,7 @@ header .lsw select option{color:#1b2330}
 header .by{margin-left:14px;text-align:right;font-size:12.5px;color:#c9d6e4;line-height:1.3}
 header .by b{display:block;color:#fff;font-size:14px;font-weight:600}
 header .tag{max-width:940px;margin:6px auto 0;font-size:11.5px;color:#9fb3c8}
-@media(max-width:620px){header .by,header .tl{display:none}header h1{font-size:19px}header .lsw{padding:3px 6px}header .lsw select{font-size:14px;max-width:130px}}
+@media(max-width:620px){header .by,header .tl{display:none}header h1{font-size:19px}header .lsw{padding:3px 6px}header .lsw select{font-size:14px;max-width:110px}header{padding:8px 10px 0}header .t{gap:8px}header .logo{width:44px;height:44px}header .wm{min-width:0}header{overflow:hidden}}
 .prog{height:4px;background:rgba(255,255,255,.18);margin:8px -18px 0}.prog div{height:4px;background:var(--gold);transition:width .2s}
 footer{max-width:940px;margin:6px auto 28px;padding:0 16px;font-size:12.5px;color:var(--mute);display:flex;align-items:center;gap:10px}
 footer svg{width:26px;height:26px;flex:none}
@@ -74,6 +74,8 @@ button.small{font-size:13px;padding:6px 10px}
 .opt.sel{outline:3px solid var(--acc);background:var(--acc2)}
 .chip{padding:8px 12px;border-radius:20px}
 .big{font-size:46px;letter-spacing:.4em;text-align:center;margin:18px 0;font-variant-numeric:tabular-nums;font-weight:600}
+.fs{position:fixed;inset:0;background:#fff;z-index:90;display:flex;flex-direction:column;touch-action:manipulation;user-select:none;-webkit-user-select:none}.fs .bar{display:flex;justify-content:flex-end;gap:14px;align-items:center;padding:4px 10px;font-size:15px;color:#5a6574}.fs .bar button{padding:6px 12px;font-size:14px}.fs svg{flex:1;width:100%;min-height:0;display:block}.fs .msg{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:22px;padding:24px;color:#1b2330}
+.thumb{max-width:160px;max-height:160px;border:1px solid var(--line);border-radius:6px}
 .timer{font-size:28px;font-variant-numeric:tabular-nums;font-weight:600}
 .count{font-size:52px;font-weight:700;text-align:center}
 .arena{position:relative;width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
@@ -99,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.8.1";
+const VERSION="0.9.0";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -129,6 +131,8 @@ const T={
  learn2:{en:"Let us look at them once more. Try to remember all of them.",hi:"आइए इन्हें एक बार और देखें। सबको याद रखने की कोशिश कीजिए।",kn:"ಇವುಗಳನ್ನು ಇನ್ನೊಮ್ಮೆ ನೋಡೋಣ. ಎಲ್ಲವನ್ನೂ ನೆನಪಿಟ್ಟುಕೊಳ್ಳಲು ಪ್ರಯತ್ನಿಸಿ."},
  ds_fwd:{en:"I will say some numbers. When I stop, say them back in the same order.",hi:"मैं कुछ अंक बोलूँगा/बोलूँगी। जब मैं रुकूँ, आप उन्हें उसी क्रम में दोहराइए।",kn:"ನಾನು ಕೆಲವು ಸಂಖ್ಯೆಗಳನ್ನು ಹೇಳುತ್ತೇನೆ. ನಾನು ನಿಲ್ಲಿಸಿದಾಗ, ಅದೇ ಕ್ರಮದಲ್ಲಿ ಹೇಳಿ."},
  ds_bwd:{en:"Now I will say some numbers. Say them back in reverse order, the last one first.",hi:"अब मैं कुछ अंक बोलूँगा/बोलूँगी। उन्हें उल्टे क्रम में बोलिए, आखिरी अंक पहले।",kn:"ಈಗ ನಾನು ಕೆಲವು ಸಂಖ್ಯೆಗಳನ್ನು ಹೇಳುತ್ತೇನೆ. ಅವುಗಳನ್ನು ಹಿಮ್ಮುಖ ಕ್ರಮದಲ್ಲಿ ಹೇಳಿ, ಕೊನೆಯದನ್ನು ಮೊದಲು."},
+ bisect:{en:"Touch the exact middle of each line."},
+ srt:{en:"Touch the screen as fast as you can when the green circle appears."},
  cancel:{en:"Touch every triangle that points up, like this one. Search the whole screen. Tell me when you are done.",hi:"इस जैसे, ऊपर की ओर नोक वाले हर त्रिकोण को छुइए। पूरी स्क्रीन पर ढूँढिए। हो जाने पर मुझे बताइए।",kn:"ಇದರಂತೆ ಮೇಲ್ಮುಖವಾಗಿರುವ ಪ್ರತಿಯೊಂದು ತ್ರಿಕೋನವನ್ನು ಮುಟ್ಟಿ. ಇಡೀ ಪರದೆಯಲ್ಲಿ ಹುಡುಕಿ. ಮುಗಿದಾಗ ನನಗೆ ಹೇಳಿ."},
  sym:{en:"Look at the two patterns. If they are exactly the same, touch the tick. If they are different, touch the cross. Go as fast as you can without mistakes.",hi:"दोनों आकृतियों को देखिए। अगर दोनों बिल्कुल एक जैसी हैं, तो सही के निशान को छुइए। अगर अलग हैं, तो क्रॉस को छुइए। बिना गलती किए जितनी जल्दी हो सके करिए।",kn:"ಎರಡು ಚಿತ್ರವಿನ್ಯಾಸಗಳನ್ನು ನೋಡಿ. ಅವು ಸಂಪೂರ್ಣವಾಗಿ ಒಂದೇ ಆಗಿದ್ದರೆ ಸರಿ ಗುರುತನ್ನು ಮುಟ್ಟಿ. ಬೇರೆ ಬೇರೆ ಆಗಿದ್ದರೆ ಅಡ್ಡ ಗುರುತನ್ನು ಮುಟ್ಟಿ. ತಪ್ಪಿಲ್ಲದೆ ಸಾಧ್ಯವಾದಷ್ಟು ಬೇಗ ಮಾಡಿ."},
  gng:{en:"When you see the green circle, touch the screen quickly. When you see the red square, do not touch.",hi:"हरा गोला दिखे तो जल्दी से स्क्रीन छुइए। लाल चौकोर दिखे तो मत छुइए।",kn:"ಹಸಿರು ವೃತ್ತ ಕಂಡಾಗ ಬೇಗನೆ ಪರದೆಯನ್ನು ಮುಟ್ಟಿ. ಕೆಂಪು ಚೌಕ ಕಂಡಾಗ ಮುಟ್ಟಬೇಡಿ."},
@@ -209,7 +213,7 @@ function fresh(){const today=localISO(new Date());return{
  p:{ptype:"patient",lang:"en",assessDate:today,formSet:"auto",setting:"hospital",vtype:"follow",mode:"full",vf:"",adapt:"auto"},prev:null,gate:{},orient:{},
  mem:{phase:"show",trial:1,rec:[[],[],[]],encEnd:null,delayed:[],recog:[],delayedMin:null,showNames:false,intr:[0,0,0],dlDone:false,rgDone:false,dlNA:false,rgNA:false},
  ds:{fwd:{L:3,trial:1,res:[],longest:0,done:false,na:false},bwd:{L:2,trial:1,res:[],longest:0,done:false,na:false}},
- can:{done:false,na:false},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
+ can:{done:false,na:false},bis:{done:false,na:false},srt:{done:false,na:false},photos:{},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
  nam:{res:{},na:false,show:false},comp:{idx:0,taps:[],res:[]},flu:{count:0,rep:0,done:false,na:false},
  vis:{clock:{c:false,n:false,h:false},clockDone:false,clockNA:false,copy:null,copyNA:false},mrs:null,phq:Array(9).fill(null),phqNA:false,
  inf:{mode:null,rel:"",years:"",lives:"",ans:Array(8).fill(null),na:false},idx:{},ev:{m1sel:[],m1:null,m2:null,m2c:null,m3:null,m3c:null,m4:null,m4c:null,na:false},
@@ -235,7 +239,7 @@ async function speakKey(k,btn){const lang=L(),t=T[k],text=t[lang]||t.en,useLang=
   if(clip){curAudio=new Audio(clip);curAudio.onended=done;await curAudio.play();return}
   const nat=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.TextToSpeech;
   if(nat){const {languages}=await nat.getSupportedLanguages().catch(()=>({languages:[]}));
-   if(languages.length&&!languages.some(x=>x.toLowerCase().startsWith(useLang))){done();return toast(`No ${langName(useLang)} voice on this tablet. Install it in Settings > Languages > Text-to-speech > Install voice data, or read the line aloud.`)}
+   if(languages.length&&!languages.some(x=>x.toLowerCase().startsWith(useLang))){done();return toast(`No ${langName(useLang)} voice on this device. Install it in Settings > Languages > Text-to-speech > Install voice data, or read the line aloud.`)}
    await nat.speak({text,lang:VOICE[useLang],rate:0.85});return done()}
   if(!window.speechSynthesis){done();return toast("This browser cannot read aloud. Use Chrome, or read the line aloud.")}
   const vs=await voicesReady(),v=vs.find(x=>x.lang.replace("_","-").toLowerCase()===VOICE[useLang].toLowerCase())||vs.find(x=>x.lang.toLowerCase().startsWith(useLang));
@@ -252,6 +256,7 @@ function interpNote(){const id=STEPS[cur][0];if(!SPOKEN_STEPS[id]||S.p.exl!=="no
 function say(k){const t=T[k],main=t[L()]||t.en;return `<div class="say">${spkBtn(k)}${esc(main)}${pending(k)?`<span class="pend">translation pending; read in patient's language</span>`:""}${L()!=="en"&&!pending(k)?`<span class="en">${esc(t.en)}</span>`:""}</div>`}
 function nm(k){const o=P[k],a=(o.acc&&o.acc[L()])||[];return (L()!=="en"&&o[L()])?`${o[L()]}${a.length?" (also "+a.join(", ")+")":""} · ${o.en}`:o.en}
 function pointingMode(){return S.gate.speech==="none"}
+function isPhone(){return Math.min(screen.width,screen.height)<600}
 function isCtl(){return S.p.ptype==="control"}
 /* healthy controls: sessions, not days since stroke. Session number comes from the loaded visit code unless the examiner overrides it */
 function ctlSess(){const o=+S.p.csess;if(o>=1&&o<=3)return o;return S.prev&&S.prev.visits?S.prev.visits.length+1:1}
@@ -279,11 +284,11 @@ async function unpackCode(code){code=code.trim().replace(/\s+/g,"");if(!code.sta
 /* ---------- steps ---------- */
 const STEPS=[
  ["setup","Patient and session",rSetup],["idx","Index event: procedure and imaging",rIdx],["gate","Language gate",rGate],["orient","Orientation",rOrient],["learn","Picture learning",rLearn],
- ["digits","Digit span",rDigits],["cancel","Cancellation",rCancel],["sym","Pattern matching speed",rSym],["gng","Go / No-Go with rule switch",rGng],
+ ["digits","Digit span",rDigits],["cancel","Cancellation",rCancel],["bisect","Line bisection",rBis],["srt","Simple reaction time",rSrt],["sym","Pattern matching speed",rSym],["gng","Go / No-Go with rule switch",rGng],
  ["naming","Naming and comprehension",rNaming],["fluency","Animal fluency",rFluency],["draw","Clock and figure copy",rDraw],["everyday","Everyday tasks",rEveryday],
  ["mrs","Modified Rankin Scale",rMrs],["phq","PHQ-9",rPhq],["inf","Informant questions",rInf],["delayed","Delayed recall and recognition",rDelayed],["summary","Summary",rSummary]];
 /* core battery (about 6 minutes of patient time): for post-procedure visits and busy OPDs. mRS and informant questions fill the recall delay. */
-const CORE=new Set(["setup","idx","gate","orient","learn","cancel","sym","mrs","inf","delayed","summary"]);
+const CORE=new Set(["setup","idx","gate","orient","learn","cancel","srt","sym","mrs","inf","delayed","summary"]);
 function stepOn(i){const id=STEPS[i][0];if(isCtl()&&(id==="idx"||id==="inf"))return false;return S.p.mode!=="core"||CORE.has(id)}
 function delayTarget(){return S.p.mode==="core"?5:10}
 let cur=0;
@@ -297,7 +302,7 @@ document.addEventListener("click",saveSoon,true);document.addEventListener("inpu
 function go(i){stopSpeech();if(cleanup){cleanup();cleanup=null}{const dir=i>=cur?1:-1;i=Math.max(0,Math.min(STEPS.length-1,i));while(!stepOn(i)&&i>0&&i<STEPS.length-1)i+=dir}if(S.exported&&cur===STEPS.length-1&&i!==cur){S.exportSnap=JSON.stringify(visitRecord());S.exported=false}cur=Math.max(0,Math.min(STEPS.length-1,i));$("#prog").style.width=(100*cur/(STEPS.length-1))+"%";STEPS[cur][2]();syncHLang();window.scrollTo(0,0);save()}
 function shell(title,sub,body,opts={}){$("#app").innerHTML=`<div class="card"><div class="note">Step ${STEPS.map((x,i)=>i).filter(stepOn).indexOf(cur)+1} of ${STEPS.map((x,i)=>i).filter(stepOn).length}${S.p.mode==="core"?" · core battery":""}</div><h2>${title}</h2>${sub?`<div class="sub">${sub}</div>`:""}${interpNote()}${body}</div>
  <div class="nav">${cur>0?`<button id="back">Back</button>`:"<span></span>"}${cur<STEPS.length-1?`<button class="pri" id="next">Next</button>`:""}</div>`;
- {const ad=adaptSide(),pics=$$(".pics");if(ad&&STEPS[cur][0]!=="cancel"&&pics.length){pics.forEach(p=>p.classList.add(ad==="left"?"adR":"adL"));$(".card").insertAdjacentHTML("afterbegin",`<div class="exam">Layout shifted to the ${ad==="left"?"right":"left"} for ${ad}-sided field loss or neglect. Keep the tablet toward the patient's ${ad==="left"?"right":"left"}.</div>`)}}
+ {const ad=adaptSide(),pics=$$(".pics");if(ad&&STEPS[cur][0]!=="cancel"&&pics.length){pics.forEach(p=>p.classList.add(ad==="left"?"adR":"adL"));$(".card").insertAdjacentHTML("afterbegin",`<div class="exam">Layout shifted to the ${ad==="left"?"right":"left"} for ${ad}-sided field loss or neglect. Keep the device toward the patient's ${ad==="left"?"right":"left"}.</div>`)}}
  if($("#back"))$("#back").onclick=()=>go(cur-1);if($("#next"))$("#next").onclick=()=>{if(opts.onNext&&opts.onNext()===false)return;go(cur+1)}}
 function rerender(){STEPS[cur][2]();syncHLang();save()}
 function okBad(id,val){return `<button class="okb ${val===1?"sel":""}" data-id="${id}" data-v="1">Correct</button><button class="badb ${val===0?"sel":""}" data-id="${id}" data-v="0">Incorrect</button>`}
@@ -351,7 +356,7 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <div><label>Vision and hearing adequate</label><select data-k="sens">${opt([["","Select"],["yes","Yes"],["vision","Vision limited"],["hearing","Hearing limited"],["both","Both limited"]],p.sens)}</select></div>
  <div><label>Test form</label><select data-k="formSet">${opt([["auto","Automatic by timepoint"],["A","Form A"],["B","Form B"],["C","Form C"]],p.formSet)}</select></div>
  <div><label>Examiner role</label><select data-k="exr">${opt([["","Select"],["neuro","Neurologist or neuroradiologist"],["psy","Psychiatrist or psychologist"],["res","Resident or fellow"],["nurse","Nurse"],["ra","Research staff"],["other","Other"]],p.exr)}</select></div>
- <div><label>Device</label><input value="${S.device.w}×${S.device.h} px" disabled></div>
+ <div><label>Device</label><input value="${isPhone()?"Phone":"Tablet"} · ${S.device.w}×${S.device.h} px" disabled>${Math.min(screen.width,screen.height)<360?`<div class="warn">Screen below the 360 px minimum. Use a larger phone or a tablet.</div>`:""}</div>
  </div><p class="note" id="tp">${tpText()}</p>`);
  $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
  $$("[data-pt]").forEach(b=>b.onclick=()=>{S.p.ptype=b.dataset.pt;if(isCtl()){S.p.vtype="follow";if(!S.p.purpose)S.p.purpose="norm";if(!S.p.cord&&ctlSess()===1)S.p.cord=nextOrder()}rerender()});
@@ -366,7 +371,7 @@ function rGate(){const g=S.gate;
  <div class="row"><button class="okb ${g.cmd===1?"sel":""}" data-g="cmd" data-v="1">Follows</button><button class="badb ${g.cmd===0?"sel":""}" data-g="cmd" data-v="0">Does not follow</button></div>
  <h3>Speech output</h3><p class="note">Ask the patient to name two objects in the room. Judge from that and the conversation so far.</p>
  <div class="row">${[["fluent","Adequate"],["limited","Limited but usable"],["none","None or unintelligible"]].map(([k,l])=>`<button class="${g.speech===k?"sel":""}" data-g="speech" data-v="${k}">${l}</button>`).join("")}</div>
- <h3>Hand used for the tablet</h3>
+ <h3>Hand used for the screen</h3>
  <div class="row">${[["R","Right"],["L","Left"]].map(([k,l])=>`<button class="${g.hand===k?"sel":""}" data-g="hand" data-v="${k}">${l}</button>`).join("")}</div>
  <h3>Fatigue</h3><p class="note">If the patient tires, skip with Next; skipped tasks are recorded as not done. Order of priority if short of time: learning, delayed recall, cancellation, pattern matching, naming and comprehension.</p>
  ${g.speech==="none"?`<p class="warn">Pointing mode on. Digit span and fluency will be marked not administered; orientation uses picture choices.</p>`:""}
@@ -440,41 +445,82 @@ function rDigits(){const D=S.ds,pm=pointingMode();
 }
 
 /* 6 cancellation */
-function cancelLayout(){const r=mulberry32(FORM_SEED[form()]+300),cols=12,rows=8,cells=[];for(let c=0;c<cols;c++)for(let rr=0;rr<rows;rr++)cells.push({c,r:rr});
- const left=shuffle(cells.filter(x=>x.c<6),r).slice(0,10),right=shuffle(cells.filter(x=>x.c>=6),r).slice(0,10),tset=new Set([...left,...right].map(x=>x.c+","+x.r));
+/* phone-first cancellation: 8 x 5 grid, 8 targets per half, drawn full screen in landscape */
+const CW=1000,CH=520;
+function cancelLayout(){const r=mulberry32(FORM_SEED[form()]+300),cols=8,rows=5,cells=[];for(let c=0;c<cols;c++)for(let rr=0;rr<rows;rr++)cells.push({c,r:rr});
+ const left=shuffle(cells.filter(x=>x.c<4),r).slice(0,8),right=shuffle(cells.filter(x=>x.c>=4),r).slice(0,8),tset=new Set([...left,...right].map(x=>x.c+","+x.r));
  const types=["down","square","circle","diamond"];
- return cells.map((x,i)=>({i,c:x.c,x:50+x.c*100+(r()-.5)*36,y:45+x.r*90+(r()-.5)*30,t:tset.has(x.c+","+x.r)?"up":types[Math.floor(r()*4)]}))}
-function shapeSvg(t,x,y){const s=18;switch(t){case"up":return`<polygon points="${x},${y-s} ${x-s},${y+s*.8} ${x+s},${y+s*.8}" fill="none" stroke="#1b2330" stroke-width="3"/>`;
- case"down":return`<polygon points="${x},${y+s} ${x-s},${y-s*.8} ${x+s},${y-s*.8}" fill="none" stroke="#1b2330" stroke-width="3"/>`;
- case"square":return`<rect x="${x-15}" y="${y-15}" width="30" height="30" fill="none" stroke="#1b2330" stroke-width="3"/>`;
- case"circle":return`<circle cx="${x}" cy="${y}" r="16" fill="none" stroke="#1b2330" stroke-width="3"/>`;
- default:return`<polygon points="${x},${y-19} ${x+16},${y} ${x},${y+19} ${x-16},${y}" fill="none" stroke="#1b2330" stroke-width="3"/>`}}
+ return cells.map((x,i)=>({i,c:x.c,x:62+x.c*125+(r()-.5)*36,y:58+x.r*101+(r()-.5)*24,t:tset.has(x.c+","+x.r)?"up":types[Math.floor(r()*4)]}))}
+function shapeSvg(t,x,y,k=1){const s=18*k,w=3*k;switch(t){case"up":return`<polygon points="${x},${y-s} ${x-s},${y+s*.8} ${x+s},${y+s*.8}" fill="none" stroke="#1b2330" stroke-width="${w}"/>`;
+ case"down":return`<polygon points="${x},${y+s} ${x-s},${y-s*.8} ${x+s},${y-s*.8}" fill="none" stroke="#1b2330" stroke-width="${w}"/>`;
+ case"square":return`<rect x="${x-15*k}" y="${y-15*k}" width="${30*k}" height="${30*k}" fill="none" stroke="#1b2330" stroke-width="${w}"/>`;
+ case"circle":return`<circle cx="${x}" cy="${y}" r="${16*k}" fill="none" stroke="#1b2330" stroke-width="${w}"/>`;
+ default:return`<polygon points="${x},${y-19*k} ${x+16*k},${y} ${x},${y+19*k} ${x-16*k},${y}" fill="none" stroke="#1b2330" stroke-width="${w}"/>`}}
 function rCancel(){const C=S.can;
  if(C.done||C.na){shell("Cancellation","Attention and spatial neglect",C.na?`<p class="note">Not administered.</p><div class="row"><button id="redo">Administer</button></div>`:
   `<table><tr><th>Left-half hits</th><th>Right-half hits</th><th>False positives</th><th>Time (s)</th><th>Centre of cancellation</th></tr>
-  <tr><td class="n">${C.hitsL} / 10</td><td class="n">${C.hitsR} / 10</td><td class="n">${C.fp}</td><td class="n">${C.time}</td><td class="n">${C.coc==null?"NA":C.coc.toFixed(3)}</td></tr></table>
+  <tr><td class="n">${C.hitsL} / 8</td><td class="n">${C.hitsR} / 8</td><td class="n">${C.fp}</td><td class="n">${C.time}</td><td class="n">${C.coc==null?"NA":C.coc.toFixed(3)}</td></tr></table>
   <p class="note">Centre of cancellation: 0 means no lateral bias; positive values mean left-sided targets were missed more often (Rorden and Karnath method). Flag threshold provisional.</p>
   <h3>Search process</h3><table><tr><th>Start position</th><th>Organisation (best R)</th><th>Path crossings</th><th>Revisits</th><th>Mean step (px)</th><th>Targets per minute</th></tr>
   <tr><td class="n">${C.sx==null?"NA":C.sx}</td><td class="n">${C.br==null?"NA":C.br}</td><td class="n">${C.ints??"NA"}</td><td class="n">${C.rev??"NA"}</td><td class="n">${C.dist??"NA"}</td><td class="n">${C.rate??"NA"}</td></tr></table>
   <p class="note">Start position runs from −1 (far left) to +1 (far right). Best R near 1 means a systematic row or column search; low values with many crossings mean a disorganised search. Research measures; no cutoffs.</p>
   <div class="row"><button id="redo" class="small">Repeat task</button></div>`);$("#redo").onclick=()=>{S.can={done:false,na:false};rerender()};return}
- shell("Cancellation","Tablet flat and centred in front of the patient, landscape. 90 seconds maximum.",`${say("cancel")}
-  <div class="row"><svg width="50" height="50" viewBox="0 0 50 50">${shapeSvg("up",25,27)}</svg><span class="note">Target: upward triangle. 10 targets on each side.</span></div>
-  <div class="row"><button class="pri" id="start">Start</button><button id="stop" disabled>Patient says done</button><button id="na">Not administered</button><span class="timer" id="tm">0</span></div>
-  <div class="arena" id="arena" style="display:none"></div>`);
+ shell("Cancellation","Phone or tablet flat and centred in front of the patient, turned sideways. The shapes fill the screen. 90 seconds maximum; tap Done when the patient says they have finished.",`${say("cancel")}
+  <div class="row"><svg width="50" height="50" viewBox="0 0 50 50">${shapeSvg("up",25,27)}</svg><span class="note">Target: upward triangle. 8 targets on each side.</span></div>
+  <div class="row"><button class="pri" id="start">Start</button><button id="na">Not administered</button></div>`);
  let items=cancelLayout(),hit=new Set(),fp=0,fpSet=new Set(),t0=0,iv=null,taps=[];
  $("#na").onclick=()=>{S.can={done:false,na:true};rerender()};
- const finish=()=>{clearInterval(iv);const targets=items.filter(x=>x.t==="up"),xs=targets.map(x=>x.x),mn=Math.min(...xs),mx=Math.max(...xs),norm=x=>(x-mn)/(mx-mn)*2-1;
+ const finish=()=>{clearInterval(iv);closeFull();const targets=items.filter(x=>x.t==="up"),xs=targets.map(x=>x.x),mn=Math.min(...xs),mx=Math.max(...xs),norm=x=>(x-mn)/(mx-mn)*2-1;
   const hits=targets.filter(x=>hit.has(x.i)),allMean=targets.reduce((a,x)=>a+norm(x.x),0)/targets.length;
-  S.can={done:true,na:false,hitsL:hits.filter(x=>x.c<6).length,hitsR:hits.filter(x=>x.c>=6).length,fp,time:Math.round((Date.now()-t0)/1000),
+  S.can={done:true,na:false,hitsL:hits.filter(x=>x.c<4).length,hitsR:hits.filter(x=>x.c>=4).length,fp,time:Math.round((Date.now()-t0)/1000),
    coc:hits.length?hits.reduce((a,x)=>a+norm(x.x),0)/hits.length-allMean:null,...searchMetrics(taps)};rerender()};
- $("#start").onclick=()=>{const a=$("#arena");a.style.display="block";a.innerHTML=`<svg viewBox="0 0 1200 730" width="100%" style="display:block">${items.map(x=>`<g data-i="${x.i}" style="cursor:pointer"><circle cx="${x.x}" cy="${x.y}" r="40" fill="transparent"/>${shapeSvg(x.t,x.x,x.y)}</g>`).join("")}</svg>`;
-  t0=Date.now();$("#start").disabled=true;$("#stop").disabled=false;
-  iv=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("#tm").textContent=s;if(s>=90)finish()},250);
-  a.querySelectorAll("g").forEach(g=>g.addEventListener("pointerdown",e=>{e.preventDefault();const i=+g.dataset.i,it=items[i];taps.push({i,t:Date.now()-t0,x:it.x,y:it.y,tg:it.t==="up",rep:hit.has(i)||fpSet.has(i)});if(it.t==="up"){if(!hit.has(i)){hit.add(i);g.insertAdjacentHTML("beforeend",`<circle cx="${it.x}" cy="${it.y}" r="26" fill="none" stroke="#1f5f8b" stroke-width="4"/>`)}}
-   else if(!fpSet.has(i)){fpSet.add(i);fp++;g.insertAdjacentHTML("beforeend",`<circle cx="${it.x}" cy="${it.y}" r="26" fill="none" stroke="#1f5f8b" stroke-width="4"/>`)}}))};
- $("#stop").onclick=finish;cleanup=()=>clearInterval(iv);
+ $("#start").onclick=()=>fullTask(fs=>{fs.innerHTML=`<div class="bar"><span class="timer" id="tm" style="font-size:18px">0</span><button id="stop">Done</button></div><svg viewBox="0 0 ${CW} ${CH}" preserveAspectRatio="xMidYMid meet">${items.map(x=>`<g data-i="${x.i}"><circle cx="${x.x}" cy="${x.y}" r="52" fill="transparent"/>${shapeSvg(x.t,x.x,x.y,1.45)}</g>`).join("")}</svg>`;
+  t0=Date.now();iv=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("#tm").textContent=s;if(s>=90)finish()},250);$("#stop").onclick=finish;
+  fs.querySelectorAll("g").forEach(g=>g.addEventListener("pointerdown",e=>{e.preventDefault();const i=+g.dataset.i,it=items[i];taps.push({i,t:Date.now()-t0,x:it.x,y:it.y,tg:it.t==="up",rep:hit.has(i)||fpSet.has(i)});const ring=`<circle cx="${it.x}" cy="${it.y}" r="38" fill="none" stroke="#1f5f8b" stroke-width="5"/>`;if(it.t==="up"){if(!hit.has(i)){hit.add(i);g.insertAdjacentHTML("beforeend",ring)}}
+   else if(!fpSet.has(i)){fpSet.add(i);fp++;g.insertAdjacentHTML("beforeend",ring)}}))});
+ cleanup=()=>{clearInterval(iv);closeFull()};
 }
+
+/* full-screen landscape runner for spatial tasks: asks for landscape, waits until the device is sideways, then hands over the screen */
+let FS=null;
+function landscape(){return innerWidth>innerHeight}
+function closeFull(){if(FS){FS.remove();FS=null}window.onresize=null;try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock()}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}
+function fullTask(start){closeFull();FS=document.createElement("div");FS.className="fs";document.body.appendChild(FS);
+ (async()=>{try{if(document.documentElement.requestFullscreen&&!document.fullscreenElement)await document.documentElement.requestFullscreen()}catch(e){}try{if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock("landscape")}catch(e){}})();
+ let began=false;const go2=()=>{if(began||!FS)return;if(!landscape()){FS.innerHTML=`<div class="bar"><button id="fsx">Cancel</button></div><div class="msg">Turn the phone sideways.<br>The task starts when the screen is wide.</div>`;$("#fsx").onclick=()=>{closeFull()};return}began=true;window.onresize=null;start(FS)};
+ window.onresize=()=>setTimeout(go2,150);setTimeout(go2,350)}
+
+/* 6b line bisection: six lines, centred, left-shifted and right-shifted; deviation as % of half-line, positive = rightward */
+const BIS=[{a:200,b:800,y:230},{a:60,b:560,y:150},{a:440,b:940,y:320},{a:200,b:800,y:320},{a:440,b:940,y:150},{a:60,b:560,y:230}];
+function bisRes(d){const m=a=>a.length?+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):null,pos=t=>t.a===200?"c":t.a===60?"l":"r";
+ return{mean:m(d.map(x=>x.dev)),c:m(d.filter(x=>pos(x)==="c").map(x=>x.dev)),l:m(d.filter(x=>pos(x)==="l").map(x=>x.dev)),r:m(d.filter(x=>pos(x)==="r").map(x=>x.dev)),n:d.length}}
+function rBis(){const B=S.bis;
+ if(B.done||B.na){shell("Line bisection","Spatial neglect",B.na?`<p class="note">Not administered.</p><div class="row"><button id="redo">Administer</button></div>`:
+  `<table><tr><th>Mean deviation</th><th>Centred lines</th><th>Left-shifted lines</th><th>Right-shifted lines</th></tr><tr><td class="n">${B.mean}%</td><td class="n">${B.c}%</td><td class="n">${B.l}%</td><td class="n">${B.r}%</td></tr></table>
+  <p class="note">Deviation of the touch from the true middle, as a percentage of half the line. Positive means to the right (seen in left neglect). Provisional; no cut-off yet.</p><div class="row"><button id="redo" class="small">Repeat task</button></div>`);$("#redo").onclick=()=>{S.bis={done:false,na:false};rerender()};return}
+ shell("Line bisection","Device flat in front of the patient, turned sideways. Six lines, one at a time. About 30 seconds.",`${say("bisect")}<div class="row"><button class="pri" id="start">Start</button><button id="na">Not administered</button></div>`);
+ $("#na").onclick=()=>{S.bis={done:false,na:true};rerender()};
+ $("#start").onclick=()=>fullTask(fs=>{let i=0,d=[];const next=()=>{if(i>=BIS.length){closeFull();S.bis=Object.assign({done:true,na:false},bisRes(d));rerender();return}const t=BIS[i];
+  fs.innerHTML=`<div class="bar"><span>${i+1} of ${BIS.length}</span><button id="fsx">Stop</button></div><svg id="bsv" viewBox="0 0 1000 460" preserveAspectRatio="xMidYMid meet"><rect width="1000" height="460" fill="#fff"/><line x1="${t.a}" y1="${t.y}" x2="${t.b}" y2="${t.y}" stroke="#1b2330" stroke-width="7" stroke-linecap="butt"/></svg>`;
+  $("#fsx").onclick=()=>{closeFull();rerender()};
+  const sv=$("#bsv");sv.addEventListener("pointerdown",e=>{e.preventDefault();const pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(sv.getScreenCTM().inverse()),mid=(t.a+t.b)/2;
+   d.push({a:t.a,x:Math.round(q.x),dev:+((q.x-mid)/((t.b-t.a)/2)*100).toFixed(1)});i++;fs.querySelector("svg").innerHTML="";setTimeout(next,400)},{once:true})};next()})}
+
+/* 6c simple reaction time: device baseline. Speed on later tasks is reported minus this, which removes each phone's touch delay */
+function rSrt(){const R=S.srt;
+ if(R.done||R.na){shell("Simple reaction time","Baseline speed for this patient on this device",R.na?`<p class="note">Not administered.</p><div class="row"><button id="redo">Administer</button></div>`:
+  `<table><tr><th>Median reaction time</th><th>Valid trials</th><th>Too early</th></tr><tr><td class="n">${R.rt==null?"NA":Math.round(R.rt)+" ms"}</td><td class="n">${R.n}</td><td class="n">${R.early}</td></tr></table><div class="row"><button id="redo" class="small">Repeat task</button></div>`);$("#redo").onclick=()=>{S.srt={done:false,na:false};rerender()};return}
+ shell("Simple reaction time","Patient uses the unaffected hand. 3 practice, then 10 trials. About 30 seconds.",`${say("srt")}
+  <div class="row"><button class="pri" id="prac">Practice</button><button id="run" disabled>Start</button><button id="na">Not administered</button><span class="note" id="st"></span></div>
+  <div class="arena" id="arena" style="height:300px"></div>`);
+ const A=$("#arena");let timers=[],on=null,waiting=false,rts=[],early=0;const clear=()=>{timers.forEach(clearTimeout);timers=[]};
+ const run=(n,practice,seed)=>{const r=mulberry32(seed);let k=0;rts=[];early=0;$("#prac").disabled=true;$("#run").disabled=true;
+  const trial=()=>{if(k>=n){A.innerHTML="";if(practice){$("#st").textContent="Practice done.";$("#prac").disabled=false;$("#run").disabled=false}else{const ok=rts.filter(x=>x>=150);S.srt={done:true,na:false,rt:median(ok),n:ok.length,early,cv:cv(ok)};rerender()}return}
+   A.innerHTML="";waiting=true;on=null;timers.push(setTimeout(()=>{A.innerHTML=`<div class="stim" style="border-radius:50%;background:#1f9d55"></div>`;on=performance.now();timers.push(setTimeout(()=>{if(on!=null){on=null;A.innerHTML="";k++;timers.push(setTimeout(trial,500))}},2000))},1000+Math.floor(r()*1500)))};
+  A.onpointerdown=e=>{e.preventDefault();if(on!=null){const rt=performance.now()-on;on=null;rts.push(rt);A.innerHTML=practice?`<div class="msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#5a6574">Good</div>`:"";clear();k++;timers.push(setTimeout(trial,600))}else if(waiting){early++}};
+  trial()};
+ $("#prac").onclick=()=>run(3,true,11);$("#run").onclick=()=>run(10,false,FORM_SEED[form()]+800);
+ $("#na").onclick=()=>{clear();S.srt={done:false,na:true};rerender()};cleanup=clear}
 
 /* 7 pattern matching speed (processing speed; nonverbal, literacy-free) */
 function patTrials(seed,n){const r=mulberry32(seed),cells=[0,1,2,3,4,5,6,7,8],out=[];for(let i=0;i<n;i++){const a=shuffle(cells,r).slice(0,4).sort();const same=r()<0.5;let b=a.slice();
@@ -570,6 +616,10 @@ function rFluency(){const F=S.flu;
  cleanup=()=>{if(iv){clearInterval(iv);if(!F.done){F.count=0;F.rep=0;F.ts=[];F.interrupted=true}}};
 }
 
+/* photograph the paper drawings: downscaled JPEG kept with the session until saved from the summary */
+function takePhoto(key){const inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.capture="environment";
+ inp.onchange=()=>{const f=inp.files&&inp.files[0];if(!f)return;const img=new Image();img.onload=()=>{const m=1000,sc=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext("2d").drawImage(img,0,0,c.width,c.height);S.photos=S.photos||{};S.photos[key]=c.toDataURL("image/jpeg",0.7);URL.revokeObjectURL(img.src);rerender()};img.src=URL.createObjectURL(f)};inp.click()}
+function photoRow(key,lab){const ph=(S.photos||{})[key];return `<div class="row">${ph?`<img class="thumb" src="${ph}" alt="">`:""}<button data-ph="${key}">${ph?"Retake photo":"Photograph the "+lab}</button>${ph?"":`<span class="note">Lay the paper flat in good light and fill the frame.</span>`}</div>`}
 /* 11 clock + copy */
 function rDraw(){const V=S.vis,c=V.clock;
  const fig=`<svg viewBox="0 0 200 180" width="200" height="180"><polygon points="40,80 100,25 160,80" fill="none" stroke="#1b2330" stroke-width="3"/><rect x="40" y="80" width="120" height="90" fill="none" stroke="#1b2330" stroke-width="3"/><rect x="88" y="120" width="26" height="50" fill="none" stroke="#1b2330" stroke-width="3"/><rect x="56" y="98" width="24" height="22" fill="none" stroke="#1b2330" stroke-width="3"/><line x1="68" y1="98" x2="68" y2="120" stroke="#1b2330" stroke-width="2"/><line x1="56" y1="109" x2="80" y2="109" stroke="#1b2330" stroke-width="2"/></svg>`;
@@ -578,16 +628,17 @@ function rDraw(){const V=S.vis,c=V.clock;
  ${S.p.lit==="no"?`<p class="warn">Patient cannot read or write: clock drawing is not administered by default. Give it only if the patient knows clock numbers.</p>`:""}
  ${V.clockNA?`<p class="note">Not administered.</p><div class="row"><button id="cna">Administer</button></div>`:`
  ${[["c","Closed circle, reasonably round"],["n","All 12 numbers present, in order, in the right quadrants"],["h","Two hands pointing to 11 and 2"]].map(([k,l])=>`<div class="item"><span>${l}</span><button class="okb ${c[k]?"sel":""}" data-ck="${k}">${c[k]?"Present (1)":"Absent (0)"}</button></div>`).join("")}
+${photoRow("clock","clock")}
  <p>Clock: <b>${V.clockDone?(c.c?1:0)+(c.n?1:0)+(c.h?1:0):"not yet scored"}</b>${V.clockDone?" / 3":""}</p>
  <div class="row">${V.clockDone?"":`<button id="cz" class="small">Score 0 (none of the three present)</button>`}<button id="cna" class="small">Not administered</button></div>`}
- <h3>Figure copy</h3>${say("copy")}<div style="text-align:center">${fig}</div>
+ <h3>Figure copy</h3>${say("copy")}<div style="text-align:center">${fig}</div>${V.copyNA?"":photoRow("copy","figure copy")}
  ${V.copyNA?`<p class="note">Not administered.</p><div class="row"><button id="fna">Administer</button></div>`:`
  <div class="row">${[[2,"2 · All five elements present and joined (roof, walls, door, window, window bars)"],[1,"1 · Recognisable, with one or two elements missing or not joined"],[0,"0 · Not recognisable"]].map(([v,l])=>`<button class="${V.copy===v?"sel":""}" data-cp="${v}" style="text-align:left">${l}</button>`).join("")}</div>
  <div class="row"><button id="fna" class="small">Not administered</button></div>`}`);
  if(S.p.lit==="no"&&V.clockNA===false&&V._litSet!==true){V.clockNA=true;V._litSet=true;rerender();return}
  $$("[data-ck]").forEach(b=>b.onclick=()=>{c[b.dataset.ck]=!c[b.dataset.ck];V.clockDone=true;rerender()});
  if($("#cz"))$("#cz").onclick=()=>{V.clockDone=true;rerender()};
- $$("[data-cp]").forEach(b=>b.onclick=()=>{V.copy=+b.dataset.cp;rerender()});
+ $$("[data-cp]").forEach(b=>b.onclick=()=>{V.copy=+b.dataset.cp;rerender()});$$("[data-ph]").forEach(b=>b.onclick=()=>takePhoto(b.dataset.ph));
  $("#cna").onclick=()=>{V.clockNA=!V.clockNA;rerender()};$("#fna").onclick=()=>{V.copyNA=!V.copyNA;rerender()};
 }
 
@@ -622,7 +673,7 @@ function cv(a){if(!a||a.length<5)return null;const m=a.reduce((x,y)=>x+y,0)/a.le
 function corr(a,b){const n=a.length,ma=a.reduce((x,y)=>x+y,0)/n,mb=b.reduce((x,y)=>x+y,0)/n;let sab=0,sa=0,sb=0;for(let i=0;i<n;i++){sab+=(a[i]-ma)*(b[i]-mb);sa+=(a[i]-ma)**2;sb+=(b[i]-mb)**2}return sa&&sb?sab/Math.sqrt(sa*sb):0}
 function segCross(p1,p2,p3,p4){const d=(a,b,c)=>(c.x-a.x)*(b.y-a.y)-(b.x-a.x)*(c.y-a.y);return d(p3,p4,p1)*d(p3,p4,p2)<0&&d(p1,p2,p3)*d(p1,p2,p4)<0}
 /* cancellation search process: start position, organisation (best R), crossings, revisits, mean step, rate */
-function searchMetrics(taps){if(!taps.length)return{};const h=taps.filter(t=>t.tg&&!t.rep);const out={sx:+((taps[0].x-600)/550).toFixed(2),rev:taps.filter(t=>t.rep).length,ints:0,dist:null,br:null,rate:null};
+function searchMetrics(taps){if(!taps.length)return{};const h=taps.filter(t=>t.tg&&!t.rep);const out={sx:+((taps[0].x-CW/2)/(CW/2-62)).toFixed(2),rev:taps.filter(t=>t.rep).length,ints:0,dist:null,br:null,rate:null};
  if(h.length>=2){let s=0;for(let k=1;k<h.length;k++)s+=Math.hypot(h[k].x-h[k-1].x,h[k].y-h[k-1].y);out.dist=Math.round(s/(h.length-1));
   for(let a=1;a<h.length;a++)for(let b=a+2;b<h.length;b++)if(segCross(h[a-1],h[a],h[b-1],h[b]))out.ints++;
   const last=h[h.length-1].t;out.rate=last>0?+(h.length/(last/60000)).toFixed(1):null}
@@ -756,7 +807,7 @@ function rInf(){const I=S.inf;if(!I.mode)I.mode=infDefaultMode();const sc=infSco
 }
 
 /* ---------- provisional scores: percent of maximum, bounded tasks only. Not validated; no cut-offs. Raw scores stay the record. ---------- */
-const PROV=[["Memory",[["lt",24],["dr",8],["rcr",8]]],["Attention and orientation",[["or","orn"],["cn",20]]],["Executive",[["g1i",8],["g2i",6]]],["Language",[["nm",6],["cp",4]]],["Visuospatial",[["ck",3],["fc",2]]],["Everyday function",[["ev",4]]]];
+const PROV=[["Memory",[["lt",24],["dr",8],["rcr",8]]],["Attention and orientation",[["or","orn"],["cn",16]]],["Executive",[["g1i",8],["g2i",6]]],["Language",[["nm",6],["cp",4]]],["Visuospatial",[["ck",3],["fc",2]]],["Everyday function",[["ev",4]]]];
 function provScores(v){if(!v)return null;const x=Object.assign({},v);
  x.rcr=v.rh!=null&&v.rf!=null?Math.max(0,v.rh-v.rf):null;x.cn=v.cl!=null&&v.cr!=null?v.cl+v.cr:null;
  x.g1i=v.g1c!=null?8-v.g1c:null;x.g2i=v.g2c!=null?6-v.g2c:null;
@@ -792,18 +843,20 @@ function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();
   vt:isCtl()?"ctl":(S.p.vtype||"follow"),cs:isCtl()?ctlSess():null,md:S.p.mode||"full",vf:S.p.vf||null,ad:adaptSide()||"none",orn:orAll?(o.city==="na"?3:4):null,
   ls:M.phase==="done"?M.rec[2].length-M.rec[0].length:null,li:M.phase==="done"?(M.intr||[0,0,0]).reduce((a,b)=>a+b,0):null,
   csx:S.can.done?n(S.can.sx):null,cbr:S.can.done?n(S.can.br):null,cint:S.can.done?n(S.can.ints):null,crev:S.can.done?n(S.can.rev):null,crate:S.can.done?n(S.can.rate):null,
-  evc:S.ev.coins?1:0,srcv:S.sym.done?n(S.sym.cv):null,g1cv:S.gng.b1?n(S.gng.b1.rtcv):null,fl15:S.flu.done&&!S.flu.na?(S.flu.ts||[]).filter(t=>t<=15000).length:null,ev:evScore(),
+  evc:S.ev.coins?1:0,s0:S.srt.done&&S.srt.rt!=null?Math.round(S.srt.rt):null,smc:S.srt.done&&S.srt.rt!=null&&S.sym.done&&S.sym.rt!=null?Math.round(S.sym.rt-S.srt.rt):null,gmc:S.srt.done&&S.srt.rt!=null&&S.gng.b1&&S.gng.b1.rt!=null?Math.round(S.gng.b1.rt-S.srt.rt):null,lbd:S.bis.done?S.bis.mean:null,lbc:S.bis.done?S.bis.c:null,lbl:S.bis.done?S.bis.l:null,lbr:S.bis.done?S.bis.r:null,phc:S.photos&&S.photos.clock?1:0,phf:S.photos&&S.photos.copy?1:0,srcv:S.sym.done?n(S.sym.cv):null,g1cv:S.gng.b1?n(S.gng.b1.rtcv):null,fl15:S.flu.done&&!S.flu.na?(S.flu.ts||[]).filter(t=>t<=15000).length:null,ev:evScore(),
   mrs:n(S.mrs),phq:S.phqNA?null:phqTotal(),phq9:n(S.phq[8]),infm:S.inf.na?null:S.inf.mode,inf:sc&&!S.inf.na?sc.mean:null,infn:sc&&!S.inf.na?sc.n:null,infrel:S.inf.rel||null}}
 const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Learning slope (trial 3 minus trial 1)",""],["li","Recall intrusions during learning",""],["dr","Delayed recall","/8"],["rh","Recognition hits","/8"],["rf","Recognition false positives",""],
  ["dsf","Digit span forward",""],["dsb","Digit span backward",""],
- ["cl","Cancellation left hits","/10"],["cr","Cancellation right hits","/10"],["coc","Centre of cancellation",""],["csx","Cancellation start position (−1 left, +1 right)",""],["cbr","Cancellation search organisation (best R)",""],["cint","Cancellation path crossings",""],["crev","Cancellation revisits",""],
- ["sm","Pattern matching correct (60 s)",""],["se","Pattern matching errors",""],["srcv","Pattern matching RT variability (CV)",""],
- ["g1c","Go/No-Go commissions, block 1","/8"],["g1rt","Go/No-Go median RT, block 1 (ms)",""],["g1cv","Go/No-Go RT variability (CV)",""],["g2c","Go/No-Go commissions, reversed","/6"],
+ ["cl","Cancellation left hits","/8"],["cr","Cancellation right hits","/8"],["coc","Centre of cancellation",""],["csx","Cancellation start position (−1 left, +1 right)",""],["cbr","Cancellation search organisation (best R)",""],["cint","Cancellation path crossings",""],["crev","Cancellation revisits",""],
+ ["lbd","Line bisection mean deviation (% of half-line, + = right)",""],["s0","Simple reaction time, median (ms)",""],["sm","Pattern matching correct (60 s)",""],["smc","Pattern matching time minus simple RT (ms)",""],["se","Pattern matching errors",""],["srcv","Pattern matching RT variability (CV)",""],
+ ["g1c","Go/No-Go commissions, block 1","/8"],["g1rt","Go/No-Go median RT, block 1 (ms)",""],["g1cv","Go/No-Go RT variability (CV)",""],["gmc","Go/No-Go RT minus simple RT (ms)",""],["g2c","Go/No-Go commissions, reversed","/6"],
  ["nm","Naming","/6"],["cp","Comprehension","/4"],["fl","Animal fluency",""],["fl15","Fluency, first 15 seconds",""],
  ["ck","Clock","/3"],["fc","Figure copy","/2"],["ev","Everyday tasks","/4"],["mrs","mRS",""],["phq","PHQ-9",""],["inf","Informant mean (1–4)",""]];
 function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absent)",""]);if(S.p.lit==="no"&&pointingMode())f.push(["Non-literate patient in pointing mode: orientation choices are written numbers and month names",""]);if(S.p.lit==="no"&&v.ev!=null)f.push(["Non-literate patient: coins and notes show printed numerals; read money scores with caution",""]);if(v.vs)f.push(["Device voice gave instructions for: "+v.vs.split("|").join(", "),""]);if(v.ex==="int")f.push(["Examiner did not speak the patient's language; interpreter used for spoken answers",""]);if(v.ex==="no_int")f.push(["Examiner did not speak the patient's language and had no interpreter: spoken-answer tasks may be unreliable",""]);if(S.gate.cmd===0)f.push(["Comprehension limited: interpret all scores with caution",""]);
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
  if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect`,""]);
+ if(v.lbd!=null&&Math.abs(v.lbd)>=15)f.push([`Line bisection deviates ${v.lbd}% of the half-line: review for neglect (provisional threshold)`,""]);
+ if(isPhone())f.push(["Phone-size screen",""]);
  if(v.dm!=null&&v.dm<delayTarget())f.push([`Delayed recall given after only ${v.dm} minutes`,""]);
  if(S.phq[8]>0)f.push(["PHQ-9 item 9 positive: act on local suicide-risk protocol","red"]);
  if(S.inf.mode==="b"&&v.inf!=null&&v.inf>=3)f.push(["Informant reports decline before the stroke: possible pre-existing impairment",""]);
@@ -820,7 +873,7 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
   if(S.p.formSet&&S.p.formSet!=="auto")f.push(["Form set by hand, not by the counterbalancing order",""])}
  const tp=timepoint();if(tp&&tp.lab.startsWith("Invalid"))f.push([tp.lab,"red"]);return f}
 /* ---------- study export: one fixed column set for every patient ---------- */
-function csvKeys(flat){const base=["tool_version",...["id","ptype","age","sex","edu","lit","hand","side","strokeDate","interv","intervDate","nihss","lang","purpose","cord","c1date","csrc"].map(k=>"pt_"+k),...CEX.map(x=>x[0]),...CRF.map(x=>x[0]),"rf_smk","setting","sensory","examiner","gate_command","gate_speech","tablet_hand","device"];
+function csvKeys(flat){const base=["tool_version",...["id","ptype","age","sex","edu","lit","hand","side","strokeDate","interv","intervDate","nihss","lang","purpose","cord","c1date","csrc"].map(k=>"pt_"+k),...CEX.map(x=>x[0]),...CRF.map(x=>x[0]),"rf_smk","setting","sensory","examiner","device_class","gate_command","gate_speech","tablet_hand","device"];
  const idx=[];IDX.forEach(g=>g.f.forEach(([k])=>{const c="idx_"+k;if(!idx.includes(c))idx.push(c)}));idx.push("idx_fpe");
  const vr=Object.keys(visitRecord());const all=[...base,...idx,...vr,"flags"];Object.keys(flat).forEach(k=>{if(!all.includes(k))all.splice(all.length-1,0,k)});return all}
 const LOG_KEY="strokesmriti_log_v1";
@@ -860,6 +913,7 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  <h3>Domains</h3><table><tr><th>Domain</th><th>Tasks</th></tr>${doms.map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</table>
  <p class="note">The raw scores above are the record. The provisional scores are a convenience and will be replaced by age- and education-adjusted scores once normative data exist. Interpret against years of education. Process measures (slope, intrusions, search organisation, reaction time variability, fluency time course) are research outputs.</p>
  ${Object.keys(S.idx).length?`<h3>Index event</h3><p class="note">${Object.keys(S.idx).length} procedure and imaging fields recorded${fpe()!=null?`; first-pass effect ${fpe()?"yes":"no"}`:""}. Included in the study export and the device log, not in the visit code.</p>`:""}
+ ${Object.keys(S.photos||{}).length?`<h3>Drawing photos</h3><div class="row">${Object.values(S.photos).map(u=>`<img class="thumb" src="${u}" alt="">`).join("")}</div><div class="row"><button id="phs" class="pri">Save drawing photos</button><span class="note" id="phmsg">${S.took&&S.took.photos?"Saved.":"Not saved yet. They are cleared with the session."}</span></div>`:""}
  <h3>Visit code for the next visit</h3><p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
  <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>
  <h3>Export for the study sheet</h3>
@@ -877,14 +931,18 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
  packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
- const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
+ const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",device_class:isPhone()?"phone":"tablet",gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
   Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
  const cp=(txt,lab,onOk)=>{$("#out").value=txt;$("#out").select();const ok=()=>{$("#cpmsg").textContent=lab+" copied";if(onOk)onOk()},fail=()=>{$("#cpmsg").textContent=lab+" was NOT copied. Select the text in the box and copy it by hand."};const legacy=()=>{let r=false;try{r=document.execCommand("copy")}catch(_){}r?ok():fail()};try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,legacy);else legacy()}catch(e){legacy()}};
  const exported=(what)=>{S.took=Object.assign(S.took||{},{[what]:1});if(S.took.code&&S.took.data){S.exported=true;S.exportSnap=null;clearSaved();$("#savemsg").textContent="Visit code and results copied. The in-progress session is cleared; the results stay in this device's log."}else{save();$("#savemsg").textContent=S.took.code?"Visit code copied. Results are saved in this device's log; copy or download them too.":"Results copied. Now copy the visit code or show the QR to the family."}};
  $("#csv").onclick=()=>cp(csv,"CSV",()=>exported("data"));$("#json").onclick=()=>cp(JSON.stringify(flat,null,2),"JSON",()=>exported("data"));$("#cpv").onclick=()=>cp($("#vcode").textContent,"Visit code",()=>exported("code"));
- $("#new").onclick=()=>{const b=$("#new");if(b.dataset.c){clearSaved();S=fresh();go(0)}else{b.dataset.c=1;b.textContent="Tap again to clear"}};
+ if($("#phs"))$("#phs").onclick=async()=>{const nm=k=>`${(S.p.id||"noid").replace(/[^\w-]/g,"")}_${(v.tp||"visit").replace(/[^\w]+/g,"-")}_${v.dt}_form${v.f}_${k}.jpg`;
+  const files=await Promise.all(Object.entries(S.photos).map(async([k,u])=>new File([await (await fetch(u)).blob()],nm(k),{type:"image/jpeg"})));
+  const ok=()=>{S.took=Object.assign(S.took||{},{photos:1});save();$("#phmsg").textContent="Saved."};
+  if(navigator.canShare&&navigator.canShare({files})){navigator.share({files,title:"StrokeSmriti drawings"}).then(ok).catch(()=>{})}else{files.forEach(f=>{const a=document.createElement("a");a.href=URL.createObjectURL(f);a.download=f.name;document.body.appendChild(a);a.click();a.remove()});ok()}};
+ $("#new").onclick=()=>{const b=$("#new");if(Object.keys(S.photos||{}).length&&!(S.took&&S.took.photos)&&!b.dataset.w){b.dataset.w=1;b.textContent="Drawing photos not saved. Tap again to continue";return}if(b.dataset.c){clearSaved();S=fresh();go(0)}else{b.dataset.c=1;b.textContent="Tap again to clear"}};
 }
 window.addEventListener("beforeunload",e=>{save();if(S.p.id){e.preventDefault();e.returnValue=""}});
 /* resume an interrupted session, if one is saved on this device */

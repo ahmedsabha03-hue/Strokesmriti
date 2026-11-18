@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use StrokeSmriti, please cite it as below."
 title: "StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures"
-abstract: "Free tablet tool for measuring cognition after stroke, thrombectomy, thrombolysis and carotid or intracranial revascularisation in India. Eight languages, read-aloud instructions, pointing versions for aphasia and limited literacy, three parallel forms, procedure-anchored timepoints, and process measures. Research use only; not yet validated."
+abstract: "Free phone and tablet tool for measuring cognition after stroke, thrombectomy, thrombolysis and carotid or intracranial revascularisation in India. Eight languages, read-aloud instructions, pointing versions for aphasia and limited literacy, three parallel forms, procedure-anchored timepoints, and process measures. Research use only; not yet validated."
 type: software
 identifiers:
   - type: doi
@@ -16,7 +16,7 @@ authors:
     email: ahmedsabha03@gmail.com
     orcid: "https://orcid.org/0000-0001-8567-1150"
 doi: "10.5281/zenodo.24323874"
-version: "0.8.1"
+version: "0.9.0"
 date-released: "2026-11-18"
 repository-code: "https://github.com/ahmedsabha03-hue/Strokesmriti"
 url: "https://ahmedsabha03-hue.github.io/Strokesmriti/"
