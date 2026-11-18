@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.4";
+const VERSION="0.9.5";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -183,7 +183,7 @@ const P={
  lock:{e:"🔒",en:"lock"},apple:{e:"🍎",en:"apple"},scooter:{e:"🛵",en:"scooter"},milk:{e:"🥛",en:"glass of milk"},candle:{e:"🕯️",en:"candle"},fork:{e:"🍴",en:"fork and knife"},bag:{e:"🎒",en:"bag"},newspaper:{e:"📰",en:"newspaper"},
  clock:{e:"🕰️",en:"clock"},goat:{e:"🐐",en:"goat"},car:{e:"🚗",en:"car"},carrot:{e:"🥕",en:"carrot"},bed:{e:"🛏️",en:"bed"},basket:{e:"🧺",en:"basket"},cap:{e:"🧢",en:"cap"},leaf:{e:"🍃",en:"leaves"},
  dog:{e:"🐕",en:"dog"},comb:{e:"🪮",en:"comb"},telephone:{e:"☎️",en:"telephone"},duck:{e:"🦆",en:"duck"},knife:{e:"🔪",en:"knife"},pineapple:{e:"🍍",en:"pineapple"},socks:{e:"🧦",en:"socks"},trumpet:{e:"🎺",en:"trumpet"},garlic:{e:"🧄",en:"garlic"},train:{e:"🚆",en:"train"},
- elephant:{e:"🐘",en:"elephant",hi:"हाथी",kn:"ಆನೆ"},kite:{e:"🪁",en:"kite",hi:"पतंग",kn:"ಗಾಳಿಪಟ"},drum:{e:"🥁",en:"drum",hi:"ढोल",kn:"ಡೋಲು"},ladder:{e:"🪜",en:"ladder",hi:"सीढ़ी",kn:"ಏಣಿ"},broom:{e:"🧹",en:"broom",hi:"झाड़ू",kn:"ಪೊರಕೆ"},coconut:{e:"🥥",en:"coconut",hi:"नारियल",kn:"ತೆಂಗಿನಕಾಯಿ"},
+ elephant:{e:"🐘",en:"elephant",hi:"हाथी",kn:"ಆನೆ"},kite:{e:"🪁",en:"kite",hi:"पतंग",kn:"ಗಾಳಿಪಟ"},drum:{e:"🥁",en:"drum",hi:"ढोल",kn:"ಡೋಲು"},ladder:{e:"🪜",en:"ladder",hi:"सीढ़ी",kn:"ಏಣಿ"},broom:{e:"🧹",en:"broom",hi:"झाड़ू",kn:"ಪೊರಕೆ",acc:{hi:["झाडू","बुहारी"],kn:["ಕಸಬರಿಗೆ","ಹಿಡಿಸೂಡಿ"],ta:["விளக்குமாறு","தொடப்பம்"],te:["చీపురుకట్ట"]}},coconut:{e:"🥥",en:"coconut",hi:"नारियल",kn:"ತೆಂಗಿನಕಾಯಿ",acc:{kn:["ಕಾಯಿ","ತೆಂಗಿನ ಕಾಯಿ"],te:["కొబ్బరి"],ml:["നാളികേരം"]}},
  fish:{e:"🐟",en:"fish",hi:"मछली",kn:"ಮೀನು"},pencil:{e:"✏️",en:"pencil",hi:"पेंसिल",kn:"ಪೆನ್ಸಿಲ್"},tree:{e:"🌳",en:"tree",hi:"पेड़",kn:"ಮರ"},house:{e:"🏠",en:"house",hi:"घर",kn:"ಮನೆ"},toothbrush:{e:"🪥",en:"toothbrush",hi:"टूथब्रश",kn:"ಹಲ್ಲುಜ್ಜುವ ಬ್ರಷ್"},rice:{e:"🍚",en:"rice",hi:"चावल",kn:"ಅನ್ನ"}
 };
 const SETS={A:{t:["key","umbrella","banana","bicycle","cup","diya","spoon","book"],f:["lock","apple","scooter","milk","candle","fork","bag","newspaper"]},
@@ -214,7 +214,7 @@ function fresh(){const today=localISO(new Date());return{
  mem:{phase:"show",trial:1,rec:[[],[],[]],encEnd:null,delayed:[],recog:[],delayedMin:null,showNames:false,intr:[0,0,0],dlDone:false,rgDone:false,dlNA:false,rgNA:false},
  ds:{fwd:{L:3,trial:1,res:[],longest:0,done:false,na:false},bwd:{L:2,trial:1,res:[],longest:0,done:false,na:false}},
  can:{done:false,na:false},bis:{done:false,na:false},srt:{done:false,na:false},photos:{},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
- nam:{res:{},na:false,show:false},comp:{idx:0,taps:[],res:[]},flu:{count:0,rep:0,done:false,na:false},
+ nam:{res:{},slow:{},na:false,show:false},comp:{idx:0,taps:[],res:[]},flu:{count:0,rep:0,done:false,na:false},
  vis:{clock:{c:false,n:false,h:false},clockDone:false,clockNA:false,copy:null,copyNA:false},mrs:null,phq:Array(9).fill(null),phqNA:false,
  inf:{mode:null,rel:"",years:"",lives:"",ans:Array(8).fill(null),na:false},idx:{},ev:{m1sel:[],m1:null,m2:null,m2c:null,m3:null,m3c:null,m4:null,m4c:null,na:false},
  device:{w:window.innerWidth,h:window.innerHeight,dpr:window.devicePixelRatio||1,ua:navigator.userAgent.slice(0,120)},started:new Date().toISOString()}}
@@ -586,15 +586,16 @@ function rGng(){const G=S.gng;
 }
 
 /* 9 naming + comprehension */
-function rNaming(){const N=S.nam,C=S.comp,rng=mulberry32(FORM_SEED[form()]+500),grid=shuffle(COMP_PICS,rng);
- const nameRows=NAMING.map(k=>`<div class="item"><div class="pic" style="cursor:default">${em(P[k].e)}</div>${N.show?`<div class="note" style="flex:1">Accept: ${esc(nm(k))}, or a regional synonym</div>`:`<div style="flex:1"></div>`}<div class="row">${okBad(k,N.res[k])}</div></div>`).join("");
+function rNaming(){const N=S.nam;N.slow=N.slow||{};const C=S.comp,rng=mulberry32(FORM_SEED[form()]+500),grid=shuffle(COMP_PICS,rng);
+ const nameRows=NAMING.map(k=>`<div class="item"><div class="pic" style="cursor:default">${em(P[k].e)}</div>${N.show?`<div class="note" style="flex:1">Accept: ${esc(nm(k))}, or a regional synonym</div>`:`<div style="flex:1"></div>`}<div class="row">${okBad(k,N.res[k])}${N.res[k]===1?`<button class="small ${N.slow[k]?"sel":""}" data-slow="${k}">Slow (over 5 s) or self-corrected</button>`:""}</div></div>`).join("");
  const compScore=C.res.filter(x=>x===1).length;
  let compBody;if(C.idx>=COMP.length){compBody=`<p>Comprehension: <b>${compScore}</b> / ${COMP.length}</p><div class="row"><button id="creset" class="small">Repeat comprehension</button></div>`}
  else{compBody=`<p class="note">Item ${C.idx+1} of ${COMP.length}. Patient touches the picture${COMP[C.idx].ans.length>1?"s in the order asked":""}. Say the instruction once; repeat once only if asked.</p>${say(COMP[C.idx].k)}<div class="pics">${grid.map(k=>`<div class="pic ${C.taps.includes(k)?"sel":""}" data-c="${k}">${em(P[k].e)}</div>`).join("")}</div>
   <div class="row"><button id="cskip" class="small">No response</button></div>`}
  shell("Naming and comprehension",`Naming 0–${NAMING.length} · comprehension 0–${COMP.length} (pointing, so usable in aphasia)`,`<h3>Naming</h3>${say("naming")}<div class="exam">Accepted answers are hidden from the patient. <button class="small" id="nshow">${N.show?"Hide":"Show"} accepted answers</button></div>${nameRows}<h3>Comprehension</h3>${compBody}`);
  $("#nshow").onclick=()=>{N.show=!N.show;rerender()};
- $$("button[data-id]").forEach(b=>b.onclick=()=>{S.nam.res[b.dataset.id]=+b.dataset.v;rerender()});
+ $$("button[data-id]").forEach(b=>b.onclick=()=>{S.nam.res[b.dataset.id]=+b.dataset.v;if(+b.dataset.v!==1)delete N.slow[b.dataset.id];rerender()});
+ $$("[data-slow]").forEach(b=>b.onclick=()=>{const k=b.dataset.slow;N.slow[k]=N.slow[k]?0:1;rerender()});
  const adv=ok=>{C.res.push(ok?1:0);C.idx++;C.taps=[];rerender()};
  $$("[data-c]").forEach(d=>d.onclick=()=>{C.taps.push(d.dataset.c);const ans=COMP[C.idx].ans;if(C.taps.length>=ans.length)adv(ans.every((a,i)=>C.taps[i]===a));else rerender()});
  if($("#cskip"))$("#cskip").onclick=()=>adv(false);
@@ -844,7 +845,7 @@ function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();
   sm:S.sym.done?S.sym.correct:null,se:S.sym.done?S.sym.err:null,srt:S.sym.done&&S.sym.rt!=null?Math.round(S.sym.rt):null,
   g1h:S.gng.b1?S.gng.b1.hits:null,g1late:S.gng.b1?n(S.gng.b1.late):null,g2late:S.gng.b2?n(S.gng.b2.late):null,g1c:S.gng.b1?S.gng.b1.com:null,g1rt:S.gng.b1&&S.gng.b1.rt!=null?Math.round(S.gng.b1.rt):null,
   g2h:S.gng.b2?S.gng.b2.hits:null,g2c:S.gng.b2?S.gng.b2.com:null,g2rt:S.gng.b2&&S.gng.b2.rt!=null?Math.round(S.gng.b2.rt):null,
-  nm:namK.length===NAMING.length?namK.reduce((a,k)=>a+S.nam.res[k],0):null,cp:S.comp.idx>=COMP.length?S.comp.res.filter(x=>x).length:null,
+  nm:namK.length===NAMING.length?namK.reduce((a,k)=>a+S.nam.res[k],0):null,nmd:namK.length===NAMING.length?NAMING.filter(k=>S.nam.res[k]===1&&(S.nam.slow||{})[k]).length:null,cp:S.comp.idx>=COMP.length?S.comp.res.filter(x=>x).length:null,
   fl:S.flu.done&&!S.flu.na?S.flu.count:null,flr:S.flu.done&&!S.flu.na?S.flu.rep:null,
   ck:S.vis.clockNA||!S.vis.clockDone?null:(S.vis.clock.c?1:0)+(S.vis.clock.n?1:0)+(S.vis.clock.h?1:0),fc:S.vis.copyNA?null:n(S.vis.copy),
   vt:isCtl()?"ctl":(S.p.vtype||"follow"),cs:isCtl()?ctlSess():null,md:S.p.mode||"full",vf:S.p.vf||null,ad:adaptSide()||"none",orn:orAll?(o.city==="na"?3:4):null,
@@ -857,7 +858,7 @@ const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Lea
  ["cl","Cancellation left hits","/8"],["cr","Cancellation right hits","/8"],["coc","Centre of cancellation",""],["csx","Cancellation start position (−1 left, +1 right)",""],["cbr","Cancellation search organisation (best R)",""],["cint","Cancellation path crossings",""],["crev","Cancellation revisits",""],
  ["lbd","Line bisection mean deviation (% of half-line, + = right)",""],["s0","Simple reaction time, median (ms)",""],["sm","Pattern matching correct (60 s)",""],["smc","Pattern matching time minus simple RT (ms)",""],["se","Pattern matching errors",""],["srcv","Pattern matching RT variability (CV)",""],
  ["g1c","Go/No-Go commissions, block 1","/8"],["g1rt","Go/No-Go median RT, block 1 (ms)",""],["g1cv","Go/No-Go RT variability (CV)",""],["gmc","Go/No-Go RT minus simple RT (ms)",""],["g2c","Go/No-Go commissions, reversed","/6"],
- ["nm","Naming","/6"],["cp","Comprehension","/4"],["fl","Animal fluency",""],["fl15","Fluency, first 15 seconds",""],
+ ["nm","Naming","/6"],["nmd","Naming: correct but slow or self-corrected",""],["cp","Comprehension","/4"],["fl","Animal fluency",""],["fl15","Fluency, first 15 seconds",""],
  ["ck","Clock","/3"],["fc","Figure copy","/2"],["ev","Everyday tasks","/4"],["mrs","mRS",""],["phq","PHQ-9",""],["inf","Informant mean (1–4)",""]];
 function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absent)",""]);if(S.p.lit==="no"&&pointingMode())f.push(["Non-literate patient in pointing mode: orientation choices are written numbers and month names",""]);if(S.p.lit==="no"&&v.ev!=null)f.push(["Non-literate patient: coins and notes show printed numerals; read money scores with caution",""]);if(v.vs)f.push(["Device voice gave instructions for: "+v.vs.split("|").join(", "),""]);if(v.ex==="int")f.push(["Examiner did not speak the patient's language; interpreter used for spoken answers",""]);if(v.ex==="no_int")f.push(["Examiner did not speak the patient's language and had no interpreter: spoken-answer tasks may be unreliable",""]);if(S.gate.cmd===0)f.push(["Comprehension limited: interpret all scores with caution",""]);
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
