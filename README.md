@@ -44,4 +44,7 @@ Study protocol requirements for sites:
 - Collect study data with the Android app. On the website the log sits in browser storage and "Clear browsing data" erases it.
 - Use phones or tablets with a screen lock; the log holds many patients' records unencrypted.
 - Phones (at least 360 px wide) and tablets both work. Speed scores are reported minus each patient's simple reaction time on the same device, which removes most of the difference in touch delay between devices. The export records the device class and screen size; where possible use one device model per site.
+- Each examiner gets a pseudonymous code (for example NIM-07) from a site examiner list kept off the device, and enters it at every session; the export carries it as `examiner_id` for examiner effects and inter-rater agreement.
+- Certification: an examiner tests study patients alone only after two supervised practice sessions (practice mode) with a certified senior who signs them off. Until then they choose "No" for Examiner certified and test only with a certified examiner present. The export records this as `examiner_certified`.
+- Examiner notes are free text and go into the log and export. No names or other identifiers; check notes before sharing an export.
 - Decide in advance whether instructions come from the examiner or the device voice, and keep to it. The export records, per task, where the device voice was used (`vs`) and the translation version (`tv`).

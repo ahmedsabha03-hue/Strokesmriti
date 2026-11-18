@@ -101,7 +101,7 @@ td.n{font-variant-numeric:tabular-nums}
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="0.9.11";
+const VERSION="1.0.0";
 document.getElementById("ver").textContent=VERSION;
 const SAVE_KEY="psc_tool_session_v1";
 /* local-date helpers: the earlier build used UTC, which gave the wrong default date in IST before 05:30 and mis-scored the orientation month across a UTC day boundary */
@@ -209,8 +209,11 @@ const IMG={"🧹": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My
 function em(e){const u=IMG[e];return u?`<img class="emi" src="${u}" alt="">`:`<span>${e}</span>`}
 /* ---------- state ---------- */
 let S;
+/* examiner ID: a pseudonymous code from the site's examiner list, remembered on this device for the next session */
+const EX_KEY="strokesmriti_examiner_v1";
+function lastExaminer(){try{return localStorage.getItem(EX_KEY)||""}catch(e){return""}}
 function fresh(){const today=localISO(new Date());return{
- p:{ptype:"patient",lang:"en",assessDate:today,formSet:"auto",setting:"hospital",vtype:"follow",mode:"full",vf:"",adapt:"auto"},prev:null,gate:{},orient:{},
+ p:{ptype:"patient",lang:"en",assessDate:today,formSet:"auto",setting:"hospital",vtype:"follow",mode:"full",vf:"",adapt:"auto",exid:lastExaminer()},prev:null,gate:{},orient:{},
  mem:{phase:"show",trial:1,rec:[[],[],[]],encEnd:null,delayed:[],recog:[],delayedMin:null,showNames:false,intr:[0,0,0],dlDone:false,rgDone:false,dlNA:false,rgNA:false},
  ds:{fwd:{L:3,trial:1,res:[],longest:0,done:false,na:false},bwd:{L:2,trial:1,res:[],longest:0,done:false,na:false}},
  can:{done:false,na:false},bis:{done:false,na:false},srt:{done:false,na:false},photos:{},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
@@ -326,7 +329,8 @@ function nextVisit(){if(isCtl())return null;const tp=timepoint(),i=idxDate();if(
  const w=tp.d<75?WIN[2]:tp.d<330?WIN[4]:null;return w?{lab:w[0],a:addDays(i,w[1]),b:addDays(i,w[2])}:null}
 function setupIssues(){const p=S.p,m=[],w=[];
  if(!p.id)m.push("Study ID");if(!p.age)m.push(isCtl()?"Age":"Age at stroke");if(p.edu===""||p.edu==null)m.push("Years of education");if(!p.lit)m.push("Can read and write");if(!p.hand)m.push("Handedness");
- if(!p.sens)m.push("Vision and hearing");if(!p.exl)m.push("Whether you speak the patient's language");if(!p.exr)m.push("Examiner role");
+ if(!p.sens)m.push("Vision and hearing");if(!p.exl)m.push("Whether you speak the patient's language");if(!p.exr)m.push("Examiner role");if(!p.exid)m.push("Examiner ID");if(!p.excert)m.push("Examiner certified");
+ if(p.exid&&!/^[A-Za-z0-9-]{2,12}$/.test(p.exid))w.push("Examiner ID should be a short code (letters, numbers, hyphen), not a name");
  if(isCtl()){if(CEX.some(([k])=>!p[k]))m.push("Eligibility checklist");if(!p.cord)m.push("Form order")}
  else{if(!p.strokeDate&&!p.intervDate)m.push("Stroke onset or intervention date");if(!p.interv)m.push("Intervention");if(!p.side)m.push("Lesion side");if(!p.vf)m.push("Visual fields")}
  if(p.age&&(+p.age<18||+p.age>110))w.push(`Age ${p.age} looks wrong`);if(p.edu!==""&&p.edu!=null&&(+p.edu<0||+p.edu>25))w.push(`Education ${p.edu} years looks wrong`);
@@ -351,6 +355,8 @@ const HELP={
  interv:"What was done to treat this stroke. Clot-dissolving injection = IV thrombolysis. Clot pulled out through a catheter = Thrombectomy. Stent or surgery on the neck artery = Carotid stenting or endarterectomy. Check the discharge summary.",
  vtype:"Almost every visit is Follow-up. Choose Pre-procedure only when testing before a planned carotid or brain artery stent or surgery. Post-procedure is 1 to 3 days after that planned procedure.",
  mode:"Full takes about 18 minutes and is the normal choice. Core takes about 6 minutes: use it for the 1 to 3 day post-procedure visit, or when the patient is too tired for the full test.",
+ exid:"Your examiner code from the site list, for example NIM-07. Never your name. The same code every time you test, so results can be checked for differences between examiners.",
+ excert:"Certified means you have done two supervised practice sessions with a senior examiner, using practice mode, and the senior has signed you off. Until then, test study patients only with a certified examiner present and choose No.",
  exl:"If you do not speak the patient's language, someone (often a relative or nurse) repeats the instructions for you. Say so here; it is saved with the results so the scores can be read with care."};
 const TIPS={
  setup:"Fill every box. Tap “What is this?” under any box you are unsure about.",
@@ -372,7 +378,7 @@ const TIPS={
  phq:"Read each question and the four answer choices. Mark not administered if the patient cannot understand the questions.",
  inf:"Ask the family member away from the patient. At the first visit, ask about how the patient was before the stroke.",
  delayed:"First ask the patient to name the pictures from memory without showing anything. Then do the recognition by touch.",
- summary:"In practice mode nothing is saved. In a real visit, copy the visit code and the results before starting the next patient."};
+ summary:"In practice mode nothing is saved and no visit code is made. In a real visit, copy the visit code and the results before starting the next patient."};
 function pracNote(){if(!S.p.prac)return"";const t=TIPS[STEPS[cur][0]];return `<div class="exam" style="border-color:#c98a1b;background:#fff7e6"><b>Practice mode</b> · nothing is saved.${t?" "+t:""}</div>`}
 /* 1 setup */
 function tpText(){const t=timepoint();if(isCtl())return t?`${t.lab}${ctlSess()>1?` · day ${t.d} after session 1`:""} · order ${S.p.cord||"not set"} · form ${form()}`:"Enter the assessment date.";return t?`${t.d<0?`${-t.d} day(s) before the procedure`:`Day ${t.d} after index date`} · timepoint: <b>${t.lab}</b>${t.lab==="Unscheduled"?` (nearest: ${nearestWin(t.d)[0]}, days ${nearestWin(t.d)[1]}–${nearestWin(t.d)[2]})`:""}${optionalVisit(t.lab)?" (optional visit; form reused)":""} · form ${form()}`:"Enter intervention (or stroke) date and assessment date to set the timepoint."}
@@ -394,7 +400,7 @@ function ctlBlock(p,opt){const yn=k=>`<select data-k="${k}">${opt([["","Select"]
 function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value="${k}" ${v===k?"selected":""}>${l}</option>`).join("");
  const prevList=S.prev?`<table><tr><th>Previous visit</th><th>Timepoint</th><th>Form</th></tr>${S.prev.visits.map(v=>`<tr><td>${v.dt?esc(v.dt):(v.d!=null?"Day "+v.d:"")}</td><td>${esc(v.tp)}</td><td>${esc(v.f)}</td></tr>`).join("")}</table>`:"";
  shell("Patient and session","Use a study ID only. Do not enter the patient's name.",`
- <div class="row"><button id="pracmode" class="${p.prac?"sel":""}">${p.prac?"Practice mode is on: nothing is saved":"Practice mode (for training, nothing saved)"}</button></div>
+ <div class="row"><button id="pracmode" class="${p.prac?"sel":""}">${p.prac?"Practice mode is on: nothing saved, no visit code":"Practice mode (for training: nothing saved, no visit code)"}</button></div>
  <details class="note" style="margin-bottom:10px"><summary style="cursor:pointer"><b>Before you start</b></summary>
  <ul style="padding-left:20px;margin:6px 0"><li>Quiet room, no family prompting the patient (the informant is asked separately).</li><li>Patient wearing their usual glasses and hearing aid.</li><li>Phone on silent or Do Not Disturb, brightness high, battery above 30%.</li><li>Plain paper and a pen ready for the clock and figure copy, with no name on the paper.</li><li>Patient seated, device within easy reach of the unaffected hand.</li><li>Time: about 18 minutes for the full battery, 6 for the core.</li></ul></details>
  <h3>Follow-up visit?</h3><p class="note">Paste the visit code from the patient's last assessment. It fills in the details below and shows change since last time.</p>
@@ -427,10 +433,12 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
  <div><label>Vision and hearing adequate</label><select data-k="sens">${opt([["","Select"],["yes","Yes"],["vision","Vision limited"],["hearing","Hearing limited"],["both","Both limited"]],p.sens)}</select></div>
  <div><label>Test form</label><select data-k="formSet">${opt([["auto","Automatic by timepoint"],["A","Form A"],["B","Form B"],["C","Form C"]],p.formSet)}</select></div>
  <div><label>Examiner role</label><select data-k="exr">${opt([["","Select"],["neuro","Neurologist or neuroradiologist"],["psy","Psychiatrist or psychologist"],["res","Resident or fellow"],["nurse","Nurse"],["ra","Research staff"],["other","Other"]],p.exr)}</select></div>
+ <div><label>Examiner ID (a code, not your name)</label><input data-k="exid" value="${esc(p.exid||"")}" placeholder="e.g. NIM-07" maxlength="12" autocomplete="off">${wi(HELP.exid)}</div>
+ <div><label>Examiner certified</label><select data-k="excert">${opt([["","Select"],["yes","Yes: two supervised practice sessions done"],["no","No: supervised by a certified examiner"]],p.excert||"")}</select>${wi(HELP.excert)}</div>
  <div><label>Device</label><input value="${{phone:"Phone",tablet:"Tablet",computer:"Computer, no touchscreen"}[devClass()]} · ${S.device.w}×${S.device.h} px" disabled>${devClass()==="computer"?`<div class="warn">No touchscreen detected. Use this only to look around or enter interview items; patient tasks need a phone or tablet.</div>`:""}${hasTouch()&&Math.min(screen.width,screen.height)<360?`<div class="warn">Screen below the 360 px minimum. Use a larger phone or a tablet.</div>`:""}</div>
  </div><p class="note" id="tp">${tpText()}</p><div id="setwarn"></div>`,{onNext:()=>{if(S._swOK)return true;const {m,w}=setupIssues();if(!m.length&&!w.length)return true;
   $("#setwarn").innerHTML=`<div class="flag" style="display:block;margin-top:8px">${m.length?`<b>Not filled in:</b> ${m.map(esc).join(", ")}.<br>`:""}${w.length?`<b>Check:</b> ${w.map(esc).join("; ")}.`:""}<br>Tap Next again to continue anyway.</div>`;S._swOK=true;$("#setwarn").scrollIntoView({block:"center"});return false}});
- $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;S._swOK=false;if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
+ $$("[data-k]").forEach(el=>el.onchange=el.oninput=()=>{const k=el.dataset.k;S.p[k]=el.value;S._swOK=false;if(k==="exid"){try{localStorage.setItem(EX_KEY,el.value.trim())}catch(e){}}if(k==="lit"){const na=S.ev.na;S.ev=fresh().ev;S.ev.na=na}if(k==="vtype"&&el.value==="post")S.p.mode="core";$("#tp").innerHTML=tpText();if(["vtype","mode","interv","lang","purpose","cord","csess"].includes(k))rerender();else saveSoon()});
  $("#pracmode").onclick=()=>{S.p.prac=!S.p.prac;rerender()};
  $$("[data-pt]").forEach(b=>b.onclick=()=>{S.p.ptype=b.dataset.pt;if(isCtl()){S.p.vtype="follow";if(!S.p.purpose)S.p.purpose="norm";if(!S.p.cord&&ctlSess()===1)S.p.cord=nextOrder()}rerender()});
  if("BarcodeDetector" in window&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){$("#scan").style.display="";$("#scan").onclick=()=>scanQR(t=>{$("#pcode").value=t;$("#load").click()})}
@@ -952,7 +960,8 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
   const tq=timepoint(),s=ctlSess();if(tq&&s>1){if(S.p.purpose==="retest"&&(tq.d<14||tq.d>28))f.push([`Retest given ${tq.d} days after session 1 (protocol 14–28)`,""]);if(S.p.purpose==="equiv"&&tq.d<7)f.push([`Session ${s} only ${tq.d} days after session 1 (protocol at least 7)`,""])}
   if(S.p.purpose==="retest"&&s>2)f.push(["Test–retest has only two sessions","red"]);
   if(S.p.formSet&&S.p.formSet!=="auto")f.push(["Form set by hand, not by the counterbalancing order",""])}
- if(S.p.prac)f.unshift(["Practice session: not saved to the device log, not study data","red"]);
+ if(S.p.excert==="no")f.push(["Examiner not yet certified (fewer than two supervised practice sessions)",""]);
+ if(S.p.prac)f.unshift(["Practice session: no visit code, not saved to the device log, not study data","red"]);
  const tp=timepoint();if(tp&&tp.lab.startsWith("Invalid"))f.push([tp.lab,"red"]);return f}
 /* ---------- study export: one fixed column set for every patient ---------- */
 function csvKeys(flat){const base=["tool_version",...["id","ptype","age","sex","edu","lit","hand","side","strokeDate","interv","intervDate","nihss","lang","purpose","cord","c1date","csrc"].map(k=>"pt_"+k),...CEX.map(x=>x[0]),...CRF.map(x=>x[0]),"rf_smk","setting","sensory","examiner","device_class","gate_command","gate_speech","tablet_hand","device"];
@@ -997,9 +1006,9 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  ${Object.keys(S.idx).length?`<h3>Index event</h3><p class="note">${Object.keys(S.idx).length} procedure and imaging fields recorded${fpe()!=null?`; first-pass effect ${fpe()?"yes":"no"}`:""}. Included in the study export and the device log, not in the visit code.</p>`:""}
  ${Object.keys(S.photos||{}).length?`<h3>Drawing photos</h3><div class="row">${Object.values(S.photos).map(u=>`<img class="thumb" src="${u}" alt="">`).join("")}</div><div class="row"><button id="phs" class="pri">Save drawing photos</button><span class="note" id="phmsg">${S.took&&S.took.photos?"Saved.":"Not saved yet. They are cleared with the session."}</span></div>`:""}
  <h3>About this session</h3><div class="row"><button class="small ${S.intr?"sel":""}" id="intr">${S.intr?"Interrupted or patient fatigued: yes":"Mark: interrupted or patient fatigued"}</button></div>
- <label style="margin-top:6px">Examiner notes (no names or other identifiers)</label><textarea id="enote" rows="2" placeholder="e.g. patient anxious; family member in the room for orientation">${esc(S.note||"")}</textarea>
- <h3>Visit code for the next visit</h3>${(()=>{const nv=nextVisit();return nv?`<p><b>Next visit:</b> ${nv.lab}, between ${fmtD(nv.a)} and ${fmtD(nv.b)}</p>`:""})()}<p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
- <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>
+ <label style="margin-top:6px">Examiner notes (no names or other identifiers)</label><textarea id="enote" rows="2" placeholder="No names. e.g. patient anxious; family member in the room for orientation">${esc(S.note||"")}</textarea>
+ <h3>Visit code for the next visit</h3>${S.p.prac?`<p class="warn">Practice mode: no visit code or QR is made, so a practice session can never be loaded as a real visit. Do not give the family a slip.</p>`:`${(()=>{const nv=nextVisit();return nv?`<p><b>Next visit:</b> ${nv.lab}, between ${fmtD(nv.a)} and ${fmtD(nv.b)}</p>`:""})()}<p class="note">Ask the family to photograph the QR code, or print it on the discharge or OPD slip. At the next visit, tap Scan QR on the setup screen, or scan it with any phone camera and paste the text.</p>
+ <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start"><div id="qr" style="background:#fff;padding:8px;border:1px solid var(--line);border-radius:6px"></div><div class="code" id="vcode" style="flex:1;min-width:240px">generating…</div></div><div class="row"><button class="pri" id="cpv" disabled>Copy visit code</button></div>`}
  <h3>Export for the study sheet</h3>
  <div class="row"><button id="csv">Copy CSV</button><button id="json">Copy JSON</button><button id="new">New assessment</button><span class="note" id="cpmsg"></span></div>
  <textarea id="out" readonly style="height:110px;font:12px ui-monospace,monospace"></textarea>
@@ -1013,17 +1022,17 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const allV=[...(S.prev?S.prev.visits:[]),lean(v)];
  /* keep the first visit (baseline, informant pre-stroke rating) plus the three most recent */
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
- packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
+ if(!S.p.prac)packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
- const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",device_class:devClass(),gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
+ const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",examiner_id:S.p.exid||"",examiner_certified:S.p.excert||"",device_class:devClass(),gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
   Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{practice:S.p.prac?1:0,interrupted:S.intr?1:0,examiner_note:S.note||"",duration_min:S.tt?Math.round(Object.entries(S.tt).filter(([k])=>k!=="setup"&&k!=="summary").reduce((a,[,x])=>a+x,0)/6)/10:""},Object.fromEntries(STEPS.map(x=>x[0]).filter(k=>k!=="setup"&&k!=="summary").map(k=>["t_"+k,S.tt&&S.tt[k]!=null?S.tt[k]:""])),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
  const cp=(txt,lab,onOk)=>{$("#out").value=txt;$("#out").select();const ok=()=>{$("#cpmsg").textContent=lab+" copied";if(onOk)onOk()},fail=()=>{$("#cpmsg").textContent=lab+" was NOT copied. Select the text in the box and copy it by hand."};const legacy=()=>{let r=false;try{r=document.execCommand("copy")}catch(_){}r?ok():fail()};try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,legacy);else legacy()}catch(e){legacy()}};
- const exported=(what)=>{S.took=Object.assign(S.took||{},{[what]:1});if(S.took.code&&S.took.data){S.exported=true;S.exportSnap=null;clearSaved();$("#savemsg").textContent="Visit code and results copied. The in-progress session is cleared; the results stay in this device's log."}else{save();$("#savemsg").textContent=S.took.code?"Visit code copied. Results are saved in this device's log; copy or download them too.":"Results copied. Now copy the visit code or show the QR to the family."}};
+ const exported=(what)=>{S.took=Object.assign(S.took||{},{[what]:1});if((S.took.code||S.p.prac)&&S.took.data){S.exported=true;S.exportSnap=null;clearSaved();$("#savemsg").textContent="Visit code and results copied. The in-progress session is cleared; the results stay in this device's log."}else{save();$("#savemsg").textContent=S.took.code?"Visit code copied. Results are saved in this device's log; copy or download them too.":"Results copied. Now copy the visit code or show the QR to the family."}};
  /* notes are read again at copy time, so a note typed just before copying is not lost */
  const refresh=()=>{flat.examiner_note=S.note||"";flat.interrupted=S.intr?1:0;const c=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));return c};
- $("#csv").onclick=()=>cp(refresh(),"CSV",()=>exported("data"));$("#json").onclick=()=>{refresh();cp(JSON.stringify(flat,null,2),"JSON",()=>exported("data"))};$("#cpv").onclick=()=>cp($("#vcode").textContent,"Visit code",()=>exported("code"));
+ $("#csv").onclick=()=>cp(refresh(),"CSV",()=>exported("data"));$("#json").onclick=()=>{refresh();cp(JSON.stringify(flat,null,2),"JSON",()=>exported("data"))};if($("#cpv"))$("#cpv").onclick=()=>cp($("#vcode").textContent,"Visit code",()=>exported("code"));
  $("#intr").onclick=()=>{S.intr=!S.intr;rerender()};$("#enote").oninput=e=>{S.note=e.target.value;saveSoon()};
  if($("#phs"))$("#phs").onclick=async()=>{const nm=k=>`${(S.p.id||"noid").replace(/[^\w-]/g,"")}_${(v.tp||"visit").replace(/[^\w]+/g,"-")}_${v.dt}_form${v.f}_${k}.jpg`;
   const files=await Promise.all(Object.entries(S.photos).map(async([k,u])=>new File([await (await fetch(u)).blob()],nm(k),{type:"image/jpeg"})));
