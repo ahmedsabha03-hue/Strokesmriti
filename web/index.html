@@ -104,7 +104,7 @@ header .lgt{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="1.1.0";
+const VERSION="1.1.1";
 document.getElementById("ver").textContent=VERSION;
 /* larger text for examiners and patients with low vision; remembered on this device */
 (function(){const b=document.getElementById("lgt");const set=on=>{document.body.classList.toggle("lg",on);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false")};let on=false;try{on=localStorage.getItem("strokesmriti_large")==="1"}catch(e){}set(on);b.onclick=()=>{on=!on;set(on);try{localStorage.setItem("strokesmriti_large",on?"1":"0")}catch(e){}}})();
@@ -283,7 +283,7 @@ function ctlForm(){const o=S.p.cord||"ABC",pu=S.p.purpose||"norm";if(pu==="retes
 function timepoint(){if(isCtl()){const a=S.p.assessDate,i=S.p.c1date||S.p.assessDate;if(!a)return null;const d=Math.round((parseLocal(a)-parseLocal(i))/864e5);return{d,lab:d<0?"Invalid: session before session 1":"Control session "+ctlSess()}}const a=S.p.assessDate,i=S.p.intervDate||S.p.strokeDate;if(!a||!i)return null;const d=Math.round((parseLocal(a)-parseLocal(i))/864e5);let lab;
  if(S.p.vtype==="pre")return{d,lab:d<=0?"Pre-procedure":"Invalid: pre-procedure visit after the procedure date"};
  if(S.p.vtype==="post")return{d,lab:d>=0&&d<=3?"Post-procedure (24–72 h)":d<0?"Invalid: post-procedure visit before the procedure date":"Post-procedure (day "+d+")"};
- if(d<0)lab="Invalid: assessment before index date";else if(d<=10)lab="Acute / discharge";else if(d>=23&&d<=37)lab="30 days";else if(d>=75&&d<=105)lab="90 days";else if(d>=150&&d<=210)lab="6 months";else if(d>=330&&d<=400)lab="12 months";else lab="Unscheduled";return{d,lab}}
+ if(d<0)lab="Invalid: assessment before index date";else if(d>=3&&d<=10)lab="Acute / discharge";else if(d>=23&&d<=37)lab="30 days";else if(d>=75&&d<=105)lab="90 days";else if(d>=150&&d<=210)lab="6 months";else if(d>=330&&d<=400)lab="12 months";else lab="Unscheduled";return{d,lab}}
 function elective(){return["CAS","CEA","ICAS"].includes(S.p.interv)}
 /* protocol: stroke = discharge (A), 90 days (B), 12 months (C); elective = pre-procedure (A), 24–72 h (B), 30 days (C). Other visits are optional and reuse a form. */
 function autoForm(lab){if(isCtl())return ctlForm();if(lab&&lab.startsWith("Post-procedure"))return"B";const m=elective()?{"Pre-procedure":"A","30 days":"C","90 days":"A","6 months":"A","12 months":"A"}:{"Acute / discharge":"A","90 days":"B","12 months":"C","30 days":"C","6 months":"A"};return m[lab]||"A"}
@@ -330,7 +330,7 @@ function opts(arr,v){return arr.map(([k,l])=>`<option value="${k}" ${v===k?"sele
 function okBad(id,val){return `<button class="okb ${val===1?"sel":""}" data-id="${id}" data-v="1">Correct</button><button class="badb ${val===0?"sel":""}" data-id="${id}" data-v="0">Incorrect</button>`}
 
 /* ---------- examiner helpers: visit windows, setup checks, recall-delay clock, wake lock, step timing ---------- */
-const WIN=[["Acute / discharge",0,10],["30 days",23,37],["90 days",75,105],["6 months",150,210],["12 months",330,400]];
+const WIN=[["Acute / discharge",3,10],["30 days",23,37],["90 days",75,105],["6 months",150,210],["12 months",330,400]];
 function idxDate(){return S.p.intervDate||S.p.strokeDate||""}
 function addDays(iso,n){const d=parseLocal(iso);d.setDate(d.getDate()+n);return d}
 function fmtD(d){return d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}

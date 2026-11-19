@@ -10,4 +10,6 @@ v1.0.1: bug fix only. In practice mode, the message after copying results no lon
 
 v1.1.0 (neuropsychiatrist review): arousal and delirium screen before testing (arousal rating plus 4AT item scores from the official form; reduced arousal or 4AT of 4 or more skips the cognitive tasks and flags a re-test); fatigue rating before testing; strength of the arm used and dominant-hand status recorded, with motor-loaded tasks tagged; a new colour and size sequence task (literacy-free sequencing and set-shifting); GAD-2 alongside the PHQ-9; examiner-rated apathy, low mood and emotional lability (draft items, usable in aphasia); a reason code for every task without a score; form-equivalence status in the export; a larger-text option. Existing tasks and scoring are unchanged, so v1.1 data pool with v1.0.x for the shared tasks.
 
+v1.1.1: the acute / discharge window now starts on day 3 (days 3–10), so no patient is tested in the first 72 hours after the index event. Visits on day 0–2 are marked unscheduled. Agreed with the neuropsychiatrist review (D2).
+
 Data from v0.7.x and v0.9.x or later cannot be pooled: cancellation and naming items changed.
