@@ -1,4 +1,4 @@
-Research use only; not validated. v1.1.0 to v1.2.0 add the changes from the neuropsychiatrist review (19 November 2026) and a follow-up methods review, before Phase 1 data collection. v1.2.1 is the Phase 1 version.
+Research use only; not validated. v1.1.0 to v1.2.0 add the changes from the neuropsychiatrist review (19 November 2026) and a follow-up methods review, before Phase 1 data collection. v1.2.2 is the Phase 1 version (Hindi lines to follow as a translation update).
 
 Since v0.7.1: healthy control mode; phone-first design (40-item cancellation in landscape, new line bisection, simple reaction time baseline); photographed paper drawings; provisional domain scores (overall index in export only); device class recorded; review fixes to the executive score, autosave and privacy policy. Naming: tortoise and anchor replaced with broom and coconut, regional synonyms added, and a slow or self-corrected marker per item. Visual fields: testing guide and extinction options. Layout adaptation is fixed at the start of each visit from the visual fields.
 
@@ -15,5 +15,7 @@ v1.1.1: the acute / discharge window now starts on day 3 (days 3–10), so no pa
 v1.2.0 (methods review of v1.1): the delirium gate no longer blocks on the 4AT total. It blocks only on abnormal arousal, or on item 4 when a checklist of observable delirium features (each with a named source) is positive; an unclear checklist tests and flags; items 2–3 are recorded but never block, with a flag when aphasia makes them untestable. The 4AT is optional at outpatient visits. A blocked visit is replaced by its re-test in the same window. The SADQ-10 (item scores from the official form) replaces the draft observer-rated mood items; a safety question on hopelessness or self-harm thoughts is kept. Colour and size sequence: plain blue and light orange circles (no white centre), circles never shrink below 85% on small screens, and a slightly larger touch zone.
 
 v1.2.1: when 4AT item 4 scores 4, a ticked delirium feature counts even without a source (exported as unrecorded and flagged), and a checklist left uncompleted is treated as uncertain: the patient is tested and the visit flagged. Previously both cases were tested without a flag.
+
+v1.2.2: SADQ-10 removed so that no instrument needs permission. Mood in aphasia uses three original observer-rated items (draft, pending review). Tasks, scoring and the delirium gate are unchanged.
 
 Data from v0.7.x and v0.9.x or later cannot be pooled: cancellation and naming items changed.

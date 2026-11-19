@@ -20,4 +20,4 @@ Phase 1 runs in Hindi, so these four lines need translation, back-translation an
 | `sh_a` | यहाँ अलग-अलग आकार के कुछ नीले गोले हैं। इन्हें आकार के क्रम में छुएँ: पहले सबसे छोटा, फिर उससे बड़ा, और इसी तरह सबसे बड़े तक। जितनी जल्दी हो सके करें। |
 | `sh_b` | अब नीले और नारंगी गोले हैं। इन्हें सबसे छोटे से सबसे बड़े तक छुएँ, और हर बार रंग बदलें: सबसे छोटा नीला, फिर सबसे छोटा नारंगी, फिर अगला नीला, फिर अगला नारंगी, और इसी तरह आगे। जितनी जल्दी हो सके करें। |
 
-The observer-rated apathy and emotionalism items, the 4AT and GAD-2 entries are examiner-facing and stay in English. Give the 4AT, GAD-2 and SADQ-10 from their official translations.
+The observer-rated mood, apathy and emotionalism items, the 4AT and GAD-2 entries are examiner-facing and stay in English. Give the 4AT and GAD-2 from their official translations.
