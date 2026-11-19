@@ -1,5 +1,5 @@
 /* Offline cache for StrokeSmriti. VERSION changes on every release so devices fetch the new files. */
-const VERSION = "psc-1.1.1";
+const VERSION = "psc-1.2.0";
 const FILES = [
   "./",
   "./index.html",

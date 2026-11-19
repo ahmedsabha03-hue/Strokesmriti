@@ -90,7 +90,7 @@ td.n{font-variant-numeric:tabular-nums}
 .resp{font-size:44px;width:120px;height:90px;display:flex;align-items:center;justify-content:center}
 body.lg{font-size:19px}.lg .say{font-size:23px}.lg .note,.lg .exam,.lg .flag{font-size:15.5px}.lg .sub,.lg .warn{font-size:16.5px}.lg label{font-size:15.5px}.lg button{font-size:18px;padding:12px 18px}.lg button.small{font-size:15.5px;padding:8px 12px}.lg table{font-size:16px}.lg .say .en{font-size:15px}
 header .lgt{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:5px 9px;font-size:15px;font-weight:700;margin-left:auto}header .lgt.on{background:var(--gold);color:#16324f;border-color:var(--gold)}header .lgt+.lsw{margin-left:6px}
-.dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);touch-action:manipulation}.dot.done{opacity:.18}.dot.bad{box-shadow:0 0 0 4px #b3261e}
+.dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);touch-action:manipulation;box-shadow:inset 0 0 0 2px rgba(0,0,0,.28)}.dot::after{content:"";position:absolute;inset:-5px;border-radius:50%}.dot.done{opacity:.18}.dot.bad{box-shadow:0 0 0 4px #b3261e}
 .code{font:12px ui-monospace,monospace;word-break:break-all;background:#f7f7f2;border:1px solid var(--line);border-radius:6px;padding:8px}
 </style>
 </head>
@@ -104,7 +104,7 @@ header .lgt{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2
 <footer><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#16324f"/><g transform="translate(0.0 0.0) scale(1.0)"><path d="M62 20 Q38 18 31 40 Q29 47 31 51 L24 62 Q23 65.5 27 65.5 H31 V72 Q31 78.5 38 77.5 L45 76.5 V86 H71 V69 Q82 61 82 44 Q80 22 62 20 Z" fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linejoin="round"/><path d="M66 33 Q50 30 49 41 Q48 50 58 52 Q68 54 66 63 Q64 70 52 68" fill="none" stroke="#f2a541" stroke-width="3.6" stroke-linecap="round"/><circle cx="66" cy="33" r="4.6" fill="#f2a541"/><circle cx="58" cy="52" r="4.6" fill="#f2a541"/><circle cx="52" cy="68" r="4.6" fill="#f2a541"/></g></svg><div>StrokeSmriti, created by Dr Sabha Ahmed, MD, DM, FRCR. Interventional neuroradiologist. Free for clinical research use. Cite as doi:<a href="https://doi.org/10.5281/zenodo.24323874" target="_blank" rel="noopener">10.5281/zenodo.24323874</a>.</div></footer>
 <script>
 "use strict";
-const VERSION="1.1.1";
+const VERSION="1.2.0";
 document.getElementById("ver").textContent=VERSION;
 /* larger text for examiners and patients with low vision; remembered on this device */
 (function(){const b=document.getElementById("lgt");const set=on=>{document.body.classList.toggle("lg",on);b.classList.toggle("on",on);b.setAttribute("aria-pressed",on?"true":"false")};let on=false;try{on=localStorage.getItem("strokesmriti_large")==="1"}catch(e){}set(on);b.onclick=()=>{on=!on;set(on);try{localStorage.setItem("strokesmriti_large",on?"1":"0")}catch(e){}}})();
@@ -228,7 +228,7 @@ function fresh(){const today=localISO(new Date());return{
  ds:{fwd:{L:3,trial:1,res:[],longest:0,done:false,na:false},bwd:{L:2,trial:1,res:[],longest:0,done:false,na:false}},
  can:{done:false,na:false},bis:{done:false,na:false},srt:{done:false,na:false},photos:{},sym:{done:false,na:false},gng:{b1:null,b2:null,na:false},
  nam:{res:{},slow:{},na:false,show:false},comp:{idx:0,taps:[],res:[]},flu:{count:0,rep:0,done:false,na:false},
- vis:{clock:{c:false,n:false,h:false},clockDone:false,clockNA:false,copy:null,copyNA:false},mrs:null,phq:Array(9).fill(null),phqNA:false,gad:[null,null],gadNA:false,ap:Array(4).fill(null),mo:Array(4).fill(null),apNA:false,apsrc:"",st:{aro:"",at:[null,null,null],atnd:false,fat:"",ovr:false},sh:{a:null,b:null,na:false},nar:{},
+ vis:{clock:{c:false,n:false,h:false},clockDone:false,clockNA:false,copy:null,copyNA:false},mrs:null,phq:Array(9).fill(null),phqNA:false,gad:[null,null],gadNA:false,ap:Array(4).fill(null),sq:Array(10).fill(null),sqv:"",sqNA:false,lab:null,hop:"",apNA:false,apsrc:"",st:{aro:"",at:[null,null,null],atnd:false,fat:"",ovr:false,dlx:"",aph:false},sh:{a:null,b:null,na:false},nar:{},
  inf:{mode:null,rel:"",years:"",lives:"",ans:Array(8).fill(null),na:false},idx:{},ev:{m1sel:[],m1:null,m2:null,m2c:null,m3:null,m3c:null,m4:null,m4c:null,na:false},
  device:{w:window.innerWidth,h:window.innerHeight,dpr:window.devicePixelRatio||1,ua:navigator.userAgent.slice(0,120)},started:new Date().toISOString()}}
 S=fresh();
@@ -302,7 +302,7 @@ const STEPS=[
  ["setup","Patient and session",rSetup],["idx","Index event: procedure and imaging",rIdx],["state","Arousal and delirium",rState],["gate","Language gate",rGate],["orient","Orientation",rOrient],["learn","Picture learning",rLearn],
  ["digits","Digit span",rDigits],["cancel","Cancellation",rCancel],["bisect","Line bisection",rBis],["srt","Simple reaction time",rSrt],["sym","Pattern matching speed",rSym],["gng","Go / No-Go with rule switch",rGng],["shift","Colour and size sequence",rShift],
  ["naming","Naming and comprehension",rNaming],["fluency","Animal fluency",rFluency],["draw","Clock and figure copy",rDraw],["everyday","Everyday tasks",rEveryday],
- ["mrs","Modified Rankin Scale",rMrs],["phq","PHQ-9 and GAD-2",rPhq],["apmood","Apathy and mood (examiner-rated)",rApMood],["inf","Informant questions",rInf],["delayed","Delayed recall and recognition",rDelayed],["summary","Summary",rSummary]];
+ ["mrs","Modified Rankin Scale",rMrs],["phq","PHQ-9 and GAD-2",rPhq],["apmood","Apathy and mood (observer-rated)",rApMood],["inf","Informant questions",rInf],["delayed","Delayed recall and recognition",rDelayed],["summary","Summary",rSummary]];
 /* core battery (about 6 minutes of patient time): for post-procedure visits and busy OPDs. mRS and informant questions fill the recall delay. */
 const CORE=new Set(["setup","idx","state","gate","orient","learn","cancel","srt","sym","mrs","inf","delayed","summary"]);
 const BLOCK_OK=new Set(["setup","idx","state","mrs","apmood","inf","summary"]);
@@ -384,7 +384,7 @@ const TIPS={
  gng:"Explain the rule, do the practice, then start. Do not repeat the rule during the block.",
  state:"Look at the patient first: are they awake and calm? Then give the 4AT from the official form and tap each item's score. If the screen says not assessable, do not test; do the mRS, mood ratings and informant questions only.",
  shift:"Do the practice. If the patient touches the wrong circle, say “not that one” and let them find the right one. Do not point.",
- apmood:"Rate from what you see and what the family says. Do not read these to the patient.",
+ apmood:"Rate from what you see and what the family or ward staff say. Do not read these to the patient. Use the official SADQ-10 form and enter its item scores.",
  naming:"Show each picture and ask “What is this?”. Accept regional words. Mark slow if the answer took over 5 seconds or they corrected themselves.",
  fluency:"Start the timer as you say “go”. Tap once for each new animal; tap repeat for repeats or non-animals.",
  draw:"Plain paper and a pen, no name on the paper. Read the instruction exactly as written. Photograph the drawing, then score it.",
@@ -464,23 +464,35 @@ function rSetup(){const p=S.p;const opt=(arr,v)=>arr.map(([k,l])=>`<option value
 /* ---------- arousal and delirium screen (v1.1). The 4AT is given from its official form, unaltered; only item scores are entered here. ---------- */
 const AT_ITEMS=[["Item 2: orientation questions (AMT4)",[0,1,2]],["Item 3: attention (months backwards)",[0,1,2]],["Item 4: acute change or fluctuating course",[0,4]]];
 function atTotal(){const s=S.st;if(!s||s.atnd||!s.aro)return null;const a=s.at;if(s.aro==="abn")return 4+a.reduce((x,y)=>x+(y||0),0);return a.every(x=>x!=null)?a.reduce((x,y)=>x+y,0):null}
-function stWould(){if(isCtl()||!S.st)return false;const t=atTotal();return S.st.aro==="abn"||(t!=null&&t>=4)}
+/* v1.2: the decision to test rests on arousal and on item 4 only when it reflects fluctuation or new change beyond the stroke's fixed deficit.
+   Items 2 and 3 score 2 when untestable (aphasia) and pick up the impairment being measured, so they are recorded but never block. */
+function atRequired(){const t=timepoint();if(!t)return true;if(S.p.vtype==="post")return true;return t.lab==="Acute / discharge"||(t.d!=null&&t.d<3)}
+function stWould(){if(isCtl()||!S.st)return false;return S.st.aro==="abn"||(S.st.at[2]===4&&S.st.dlx==="yes")}
 function stBlock(){return stWould()&&!S.st.ovr}
-function rState(){const s=S.st,t=atTotal();
+function rState(){const s=S.st,t=atTotal(),req=atRequired();
  shell("Arousal and delirium","Before any testing. Decides whether today's cognitive scores can be interpreted.",`
  <h3>1. Arousal</h3><p class="note">Watch the patient before you speak to them, then greet them and talk briefly. This is also item 1 (alertness) of the 4AT.</p>
  <div class="row">${[["alert","Fully alert, or briefly sleepy on waking and then alert"],["abn","Drowsy, hard to keep awake, or clearly agitated"]].map(([k,l])=>`<button class="${s.aro===k?"sel":""}" data-aro="${k}" style="text-align:left">${l}</button>`).join("")}</div>
- ${s.aro==="abn"?"":`<h3>2. 4AT</h3><p class="note">Give the 4AT from the official form (the4at.com) in the patient's language, unaltered, and enter the item scores. Item 1 is taken from the arousal rating above.</p>
- ${s.atnd?`<p class="note">4AT not done.</p><div class="row"><button id="atnd">Give the 4AT</button></div>`:AT_ITEMS.map(([lab,vals],i)=>`<div class="item"><div style="flex:1 1 240px">${lab}</div><div class="row">${vals.map(v=>`<button class="${s.at[i]===v?"sel":""}" data-at="${i}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")+`<div class="row"><button id="atnd" class="small">4AT not done</button></div>`}`}
+ ${s.aro==="abn"?"":`<h3>2. 4AT${req?"":" (optional at this visit)"}</h3><p class="note">Give the 4AT from the official form (the4at.com) in the patient's language, unaltered, and enter the item scores as the form scores them. Item 1 is taken from the arousal rating above.${req?"":" At outpatient visits delirium is rare and items 2–3 mostly reflect the impairment being measured; arousal alone decides whether to test."}</p>
+ ${s.atnd?`<p class="note">4AT not done.</p><div class="row"><button id="atnd">Give the 4AT</button></div>`:AT_ITEMS.map(([lab,vals],i)=>`<div class="item"><div style="flex:1 1 240px">${lab}</div><div class="row">${vals.map(v=>`<button class="${s.at[i]===v?"sel":""}" data-at="${i}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")+
+ `${s.at[0]===2||s.at[1]===2?`<div class="row"><button id="aph" class="${s.aph?"sel":""}">Items 2–3 untestable because of aphasia</button></div>`:""}
+ ${s.at[2]===4?`<div class="exam" style="margin:10px 0"><b>Item 4 scored 4. Is it from fluctuation, or a new change beyond the stroke's fixed deficit?</b> Signs: attention or alertness that comes and goes, new confusion since admission, sleep–wake reversal, hallucinations. At the acute visit the stroke itself is a change in cognition; a fixed stroke deficit alone is not delirium.
+  <div class="row" style="margin-top:8px">${[["yes","Yes: fluctuation or new change"],["no","No: fixed stroke deficit only"]].map(([k,l])=>`<button class="${s.dlx===k?"sel":""}" data-dlx="${k}">${l}</button>`).join("")}</div></div>`:""}
+ <div class="row"><button id="atnd" class="small">4AT not done</button></div>`}`}
  ${t!=null?`<p>4AT total: <b>${t}</b> / 12</p>`:""}
- ${stWould()?`<div class="flag red" style="display:block;padding:10px 12px">Not assessable today: ${s.aro==="abn"?"reduced arousal or agitation":"4AT 4 or more (possible delirium)"}. ${s.ovr?"<b>Testing anyway on a senior's decision.</b> Every score will carry a red flag.":"The cognitive tasks will be skipped. Complete the mRS, the apathy and mood ratings and the informant questions, then re-test when the patient is alert and the 4AT is below 4, inside the visit window if possible."}</div>
-  <div class="row"><button id="ovr" class="small">${s.ovr?"Cancel: do not test today":"Senior decision: test anyway"}</button></div>`:t!=null&&t>=1?`<p class="warn">4AT 1–3: possible cognitive impairment. Testing can go ahead. If the patient's state seems to fluctuate, re-check before the memory tasks.</p>`:""}
+ ${stWould()?`<div class="flag red" style="display:block;padding:10px 12px">Not assessable today: ${s.aro==="abn"?"reduced arousal or agitation":"fluctuation or new confusion (4AT item 4)"}. ${s.ovr?"<b>Testing anyway on a senior's decision.</b> Every score will carry a red flag.":"The cognitive tasks will be skipped. Complete the mRS, apathy and mood and the informant questions, then re-test when the patient is alert and item 4 no longer shows fluctuation, inside the visit window if possible. The re-test replaces this visit in the visit code."}</div>
+  <div class="row"><button id="ovr" class="small">${s.ovr?"Cancel: do not test today":"Senior decision: test anyway"}</button></div>`
+ :s.at[2]===4&&!s.dlx?`<p class="warn">Answer the item 4 question above before going on.</p>`
+ :t!=null&&t>=4?`<p class="note">4AT ${t} without signs of delirium${s.aph?" (aphasia)":""}. Testing goes ahead; the total is recorded as scored.</p>`
+ :t!=null&&t>=1?`<p class="note">4AT 1–3: possible cognitive impairment. Testing goes ahead.</p>`:""}
  <h3>3. Fatigue before testing</h3><p class="note">Ask: “How tired do you feel right now?” and choose the closest. In aphasia, judge from the patient's face and the family's account.</p>
  <div class="row">${[["0","Not tired"],["1","A little tired"],["2","Quite tired"],["3","Very tired"]].map(([k,l])=>`<button class="${s.fat===k?"sel":""}" data-fat="${k}">${l}</button>`).join("")}</div>
  ${s.fat==="3"?`<p class="warn">Very tired: consider testing later today or on another day inside the window.</p>`:""}`);
  $$("[data-aro]").forEach(b=>b.onclick=()=>{s.aro=b.dataset.aro;s.ovr=false;rerender()});
- $$("[data-at]").forEach(b=>b.onclick=()=>{s.at[+b.dataset.at]=+b.dataset.v;s.ovr=false;rerender()});
+ $$("[data-at]").forEach(b=>b.onclick=()=>{const i=+b.dataset.at;s.at[i]=+b.dataset.v;if(i===2&&s.at[2]!==4)s.dlx="";if(s.at[0]!==2&&s.at[1]!==2)s.aph=false;s.ovr=false;rerender()});
+ $$("[data-dlx]").forEach(b=>b.onclick=()=>{s.dlx=b.dataset.dlx;s.ovr=false;rerender()});
  $$("[data-fat]").forEach(b=>b.onclick=()=>{s.fat=b.dataset.fat;rerender()});
+ if($("#aph"))$("#aph").onclick=()=>{s.aph=!s.aph;rerender()};
  if($("#atnd"))$("#atnd").onclick=()=>{s.atnd=!s.atnd;rerender()};if($("#ovr"))$("#ovr").onclick=()=>{s.ovr=!s.ovr;rerender()};
 }
 function rGate(){const g=S.gate;
@@ -680,8 +692,9 @@ function gngRes(log){const go=log.filter(x=>x.t==="go"),no=log.filter(x=>x.t==="
 const SH_R=[14,18,23.5,30.5,40,52],SH_LIM=120000;
 function shLayout(n,seed,W,H){const r=mulberry32(seed),side=adaptSide();let x0=0,x1=W;if(side==="left")x0=W*.42;else if(side==="right")x1=W*.58;
  const items=n===6?SH_R.map((R,i)=>({c:"b",k:i,R})):SH_R.flatMap((R,i)=>[{c:"b",k:i,R},{c:"o",k:i,R}]);
- for(let sc=1;sc>.5;sc-=.08){const placed=[];let ok=true;for(const it of shuffle(items,r)){const R=it.R*sc;let done=false;for(let t=0;t<400&&!done;t++){const x=x0+R+4+r()*(x1-x0-2*R-8),y=R+4+r()*(H-2*R-8);if(placed.every(p=>Math.hypot(p.x-x,p.y-y)>p.R+R+10)){placed.push(Object.assign({},it,{x,y,R}));done=true}}if(!done){ok=false;break}}if(ok)return placed}
- return items.map((it,i)=>Object.assign({},it,{x:x0+30+(i%4)*(x1-x0-60)/3,y:40+Math.floor(i/4)*(H-80)/2,R:it.R*.5}))}
+ for(let sc=1;sc>=.84;sc-=.05)for(let attempt=0;attempt<40;attempt++){const placed=[];let ok=true;for(const it of shuffle(items,r)){const R=it.R*sc;let done=false;for(let t=0;t<600&&!done;t++){const x=x0+R+4+r()*(x1-x0-2*R-8),y=R+4+r()*(H-2*R-8);if(placed.every(p=>Math.hypot(p.x-x,p.y-y)>p.R+R+10)){placed.push(Object.assign({},it,{x,y,R}));done=true}}if(!done){ok=false;break}}if(ok)return placed}
+ /* last resort: a jittered grid at 85% size, never smaller */
+ const cols=n===6?2:3,rows=Math.ceil(n/cols);return shuffle(items,r).map((it,i)=>Object.assign({},it,{x:x0+(x1-x0)*((i%cols)+.5)/cols,y:H*(Math.floor(i/cols)+.5)/rows,R:Math.min(it.R*.85,(x1-x0)/cols/2-4,H/rows/2-4)}))}
 function shOrder(n){return n===6?SH_R.map((_,i)=>"b"+i):SH_R.flatMap((_,i)=>["b"+i,"o"+i])}
 function rShift(){const H=S.sh,res=x=>x?`${(x.t/1000).toFixed(1)} s · errors ${x.e}${x.ec!=null?` (wrong colour ${x.ec})`:""} · ${x.n} of ${x.of}${x.to?" · stopped at 2 minutes":""}`:"not done";
  const tbl=`<table><tr><th>Part</th><th>Result</th></tr><tr><td>A · size order, one colour</td><td>${res(H.a)}</td></tr><tr><td>B · size order, changing colour</td><td>${res(H.b)}</td></tr></table>${H.a&&H.b&&!H.a.to&&!H.b.to?`<p>Switch cost: <b>${shSwitch()} ms</b> per circle (part B time per circle minus part A time per circle).</p>`:""}`;
@@ -697,7 +710,7 @@ function rShift(){const H=S.sh,res=x=>x?`${(x.t/1000).toFixed(1)} s · errors ${
    const adj=adaptSide();if(adj==="left")items.forEach(it=>it.x=W*.42+(it.x)*.58);else if(adj==="right")items.forEach(it=>it.x=it.x*.58);
    order=items.slice().sort((p,q)=>p.k-q.k||(p.c==="b"?-1:1)).map(it=>it.c+it.k)}
   else{items=shLayout(n,FORM_SEED[form()]+(part==="a"?900:950),W,Ht);order=shOrder(n)}
-  A.innerHTML=items.map(it=>`<div class="dot" data-id="${it.c}${it.k}" style="left:${it.x}px;top:${it.y}px;width:${2*it.R}px;height:${2*it.R}px;background:${it.c==="b"?"#1d5fa8":"radial-gradient(circle,#fff 0 22%,#e07b00 23%)"}"></div>`).join("");
+  A.innerHTML=items.map(it=>`<div class="dot" data-id="${it.c}${it.k}" style="left:${it.x}px;top:${it.y}px;width:${2*it.R}px;height:${2*it.R}px;background:${it.c==="b"?"#1d5fa8":"#f2a33a"}"></div>`).join("");
   let i=0,e=0,ec=0;const t0=performance.now();
   if(!practice)iv=setInterval(()=>{const el=performance.now()-t0;$("#tm").textContent=Math.floor(el/1000)+" s";if(el>=SH_LIM)finish(true)},250);
   const finish=(to)=>{clear();A.onpointerdown=null;if(practice){$("#st").textContent="Practice done.";$("#prac").disabled=false;$("#run").disabled=false;return}
@@ -950,21 +963,28 @@ function rPhq(){const t=phqTotal();
 /* ---------- apathy and mood, examiner-rated (v1.1). Original draft items, pending neuropsychiatrist review. Usable in aphasia because the patient does not self-report. ---------- */
 const APX=["Starts things on their own (getting up, washing, eating, talking) instead of waiting to be prompted","Shows interest in family, visitors, news or plans","Shows feeling in face and voice when something good or bad happens","Keeps at a task once started, without being pushed"];
 const APO=["As before the stroke","Somewhat less","Much less"];
-const MOX=["Looks sad, tearful or low","Says, or the family reports, that they feel hopeless, worthless or a burden","Irritable, restless or easily upset","Sudden crying or laughing out of keeping with what is happening, and hard to stop"];
-const MOO=["No","Sometimes","Most of the time"];
 function apTotal(){return !S.apNA&&S.ap.every(v=>v!=null)?S.ap.reduce((a,b)=>a+b,0):null}
-function moTotal(){return !S.apNA&&S.mo.slice(0,3).every(v=>v!=null)?S.mo[0]+S.mo[1]+S.mo[2]:null}
-function rApMood(){const row=(arr,opts,key)=>(q,i)=>`<div class="item"><div style="flex:1 1 260px">${i+1}. ${q}</div><div class="row">${opts.map((o,v)=>`<button class="${arr[i]===v?"sel":""}" data-${key}="${i}" data-v="${v}" style="font-size:13px;padding:7px 10px">${o}</button>`).join("")}</div></div>`;
- shell("Apathy and mood (examiner-rated)","Rate what you see and what the family tells you about the last 2 weeks, compared with before the stroke. The patient does not answer these, so they work in aphasia.",`
- <p class="warn">Draft items written for StrokeSmriti, pending neuropsychiatrist review. Not validated; no cut-offs.</p>
- <label>Based on</label><select id="apsrc">${opts([["","Select"],["obs","Observation only"],["obs_inf","Observation and a family member"],["obs_pt","Observation and talking with the patient"],["all","All three"]],S.apsrc)}</select>
- ${S.apNA?`<p class="note">Not administered.</p><div class="row"><button id="apna">Administer</button></div>`:`
- <h3>Apathy</h3>${APX.map(row(S.ap,APO,"ap")).join("")}<p>Apathy: <b>${apTotal()==null?"incomplete":apTotal()}</b> / 8</p>
- <h3>Mood</h3>${MOX.map(row(S.mo,MOO,"mo")).join("")}<p>Low mood (items 1–3): <b>${moTotal()==null?"incomplete":moTotal()}</b> / 6 · emotional lability (item 4): <b>${S.mo[3]==null?"not rated":S.mo[3]}</b> / 2</p>
- ${S.mo[1]>0?`<p class="flag red">Hopelessness or feeling a burden reported. Ask directly about thoughts of self-harm and follow your local protocol before the patient leaves.</p>`:""}
- <div class="row"><button id="apna" class="small">Not administered</button></div>`}`);
- $$("[data-ap]").forEach(b=>b.onclick=()=>{S.ap[+b.dataset.ap]=+b.dataset.v;rerender()});$$("[data-mo]").forEach(b=>b.onclick=()=>{S.mo[+b.dataset.mo]=+b.dataset.v;rerender()});
- $("#apsrc").onchange=e=>{S.apsrc=e.target.value;saveSoon()};$("#apna").onclick=()=>{S.apNA=!S.apNA;rerender()}}
+/* SADQ-10 (Sutcliffe and Lincoln 1998; hospital version SADQ-H10, Lincoln et al. 2011; Hindi adaptation Kaur et al. 2017). Given from the official form; only item scores are entered. */
+function sqTotal(){return !S.sqNA&&S.sq.every(v=>v!=null)?S.sq.reduce((a,b)=>a+b,0):null}
+function rApMood(){
+ shell("Apathy and mood (observer-rated)","Rated from what you see and what the family or ward staff report. The patient does not answer these, so they work in aphasia.",`
+ <label>Based on</label><select id="apsrc">${opts([["","Select"],["obs","Observation only"],["obs_inf","Observation and a family member"],["obs_staff","Observation and ward staff"],["obs_pt","Observation and talking with the patient"],["all","Observation, family and staff"]],S.apsrc)}</select>
+ <h3>Mood: SADQ-10</h3><p class="note">Give the SADQ-10 from the official form, unaltered, using the hospital version (SADQ-H10) for inpatients and the community version at follow-up; for Hindi, use the published Hindi adaptation. Enter each item's score (0–3) as the form scores it. Ask whoever knows the patient's last week best.</p>
+ <label>Version</label><select id="sqv">${opts([["","Select"],["H10","SADQ-H10 (hospital)"],["10","SADQ-10 (community)"]],S.sqv)}</select>
+ ${S.sqNA?`<p class="note">Not administered.</p><div class="row"><button id="sqna">Administer</button></div>`:
+ `${S.sq.map((x,i)=>`<div class="item"><div style="flex:0 0 70px">Item ${i+1}</div><div class="row">${[0,1,2,3].map(v=>`<button class="${x===v?"sel":""}" data-sq="${i}" data-v="${v}">${v}</button>`).join("")}</div></div>`).join("")}
+ <p>SADQ-10 total: <b>${sqTotal()==null?"incomplete":sqTotal()}</b> / 30</p><div class="row"><button id="sqna" class="small">Not administered</button></div>`}
+ <h3>Safety</h3><p>Has the patient said, or has the family reported, hopelessness, a wish to die or thoughts of self-harm?</p>
+ <div class="row">${[["no","No"],["yes","Yes"]].map(([k,l])=>`<button class="${S.hop===k?"sel":""}" data-hop="${k}">${l}</button>`).join("")}</div>
+ ${S.hop==="yes"?`<p class="flag red">Ask directly about thoughts of self-harm and follow your local protocol before the patient leaves.</p>`:""}
+ <h3>Apathy (draft items)</h3><p class="warn">Draft items written for StrokeSmriti, pending neuropsychiatrist review. Not validated; no cut-offs. Compare with before the stroke, over the last 2 weeks.</p>
+ ${S.apNA?`<p class="note">Not administered.</p><div class="row"><button id="apna">Administer</button></div>`:
+ `${APX.map((q,i)=>`<div class="item"><div style="flex:1 1 260px">${i+1}. ${q}</div><div class="row">${APO.map((o,v)=>`<button class="${S.ap[i]===v?"sel":""}" data-ap="${i}" data-v="${v}" style="font-size:13px;padding:7px 10px">${o}</button>`).join("")}</div></div>`).join("")}<p>Apathy: <b>${apTotal()==null?"incomplete":apTotal()}</b> / 8</p><div class="row"><button id="apna" class="small">Not administered</button></div>`}
+ <h3>Emotionalism (draft item)</h3><div class="item"><div style="flex:1 1 260px">Sudden crying or laughing out of keeping with what is happening, and hard to stop</div><div class="row">${["No","Sometimes","Most days"].map((o,v)=>`<button class="${S.lab===v?"sel":""}" data-lab="${v}" style="font-size:13px;padding:7px 10px">${o}</button>`).join("")}</div></div>`);
+ $$("[data-ap]").forEach(b=>b.onclick=()=>{S.ap[+b.dataset.ap]=+b.dataset.v;rerender()});$$("[data-sq]").forEach(b=>b.onclick=()=>{S.sq[+b.dataset.sq]=+b.dataset.v;rerender()});
+ $$("[data-lab]").forEach(b=>b.onclick=()=>{S.lab=+b.dataset.lab;rerender()});$$("[data-hop]").forEach(b=>b.onclick=()=>{S.hop=b.dataset.hop;rerender()});
+ $("#apsrc").onchange=e=>{S.apsrc=e.target.value;saveSoon()};$("#sqv").onchange=e=>{S.sqv=e.target.value;saveSoon()};
+ $("#apna").onclick=()=>{S.apNA=!S.apNA;rerender()};$("#sqna").onclick=()=>{S.sqNA=!S.sqNA;rerender()}}
 
 /* 15 informant */
 function infDefaultMode(){if(S.prev&&S.prev.visits.some(v=>v.infm==="b"))return"f";const t=timepoint();return(!t||t.d<=37)?"b":"f"}
@@ -1007,11 +1027,11 @@ function provBlock(v,prev){const a=provScores(v),b=provScores(prev);
  </table><p class="note">An overall index is calculated in the export only (prov_index). It is not shown here until norms exist, because a single percentage would be read as a test score.</p>`}
 /* 16 summary */
 /* ---------- reasons for missing scores (v1.1): every task without a score carries a reason code in the export ---------- */
-const NAC=[["or","orient","Orientation"],["lt","learn","Picture learning"],["dr","delayed","Delayed recall"],["rh","delayed","Recognition"],["dsf","digits","Digit span forward"],["dsb","digits","Digit span backward"],["cl","cancel","Cancellation"],["lbd","bisect","Line bisection"],["s0","srt","Simple reaction time"],["sm","sym","Pattern matching"],["g1c","gng","Go/No-Go"],["sbt","shift","Colour and size sequence"],["nm","naming","Naming"],["cp","naming","Comprehension"],["fl","fluency","Animal fluency"],["ck","draw","Clock"],["fc","draw","Figure copy"],["ev","everyday","Everyday tasks"],["mrs","mrs","mRS"],["phq","phq","PHQ-9"],["gad","phq","GAD-2"],["ap","apmood","Apathy"],["mo","apmood","Examiner-rated mood"],["inf","inf","Informant questions"]];
+const NAC=[["or","orient","Orientation"],["lt","learn","Picture learning"],["dr","delayed","Delayed recall"],["rh","delayed","Recognition"],["dsf","digits","Digit span forward"],["dsb","digits","Digit span backward"],["cl","cancel","Cancellation"],["lbd","bisect","Line bisection"],["s0","srt","Simple reaction time"],["sm","sym","Pattern matching"],["g1c","gng","Go/No-Go"],["sbt","shift","Colour and size sequence"],["nm","naming","Naming"],["cp","naming","Comprehension"],["fl","fluency","Animal fluency"],["ck","draw","Clock"],["fc","draw","Figure copy"],["ev","everyday","Everyday tasks"],["mrs","mrs","mRS"],["phq","phq","PHQ-9"],["gad","phq","GAD-2"],["ap","apmood","Apathy"],["sq","apmood","SADQ-10"],["inf","inf","Informant questions"]];
 const NAR=[["arousal","Reduced arousal or delirium"],["refused","Refused"],["fatigue","Fatigue or unwell"],["language","Aphasia or poor comprehension"],["motor","Arm weakness"],["sensory","Vision or hearing"],["literacy","Cannot read or write"],["informant","No informant available"],["time","Ran out of time"],["device","Device or software problem"],["examiner","Examiner error"],["other","Other"]];
-function naAuto(k){if(stBlock()&&!["mrs","inf","ap","mo"].includes(k))return"arousal";if(pointingMode()&&["dsf","dsb","fl"].includes(k))return"language";if((k==="phq"||k==="gad")&&(S.gate.cmd===0||pointingMode()))return"language";if(k==="ck"&&S.p.lit==="no")return"literacy";if(k==="inf"&&S.inf.na)return"informant";return""}
-function naList(v){return NAC.filter(([k,st])=>{const i=STEPS.findIndex(x=>x[0]===st);return v[k]==null&&!(k==="sbt"&&S.sh.b)&&i>=0&&(stepOn(i)||stBlock())&&!(isCtl()&&["mrs","inf","ap","mo"].includes(k))})}
-function naCols(v){const o={};NAC.forEach(([k,st])=>{const i=STEPS.findIndex(x=>x[0]===st);o["na_"+k]=v[k]!=null||(k==="sbt"&&S.sh.b)?"":(i<0||(!stepOn(i)&&!stBlock()))||(isCtl()&&["mrs","inf","ap","mo"].includes(k))?"not_in_battery":(S.nar[k]||naAuto(k)||"unspecified")});return o}
+function naAuto(k){if(stBlock()&&!["mrs","inf","ap","sq"].includes(k))return"arousal";if(pointingMode()&&["dsf","dsb","fl"].includes(k))return"language";if((k==="phq"||k==="gad")&&(S.gate.cmd===0||pointingMode()))return"language";if(k==="ck"&&S.p.lit==="no")return"literacy";if(k==="inf"&&S.inf.na)return"informant";return""}
+function naList(v){return NAC.filter(([k,st])=>{const i=STEPS.findIndex(x=>x[0]===st);return v[k]==null&&!(k==="sbt"&&S.sh.b)&&i>=0&&(stepOn(i)||stBlock())&&!(isCtl()&&["mrs","inf","ap","sq"].includes(k))})}
+function naCols(v){const o={};NAC.forEach(([k,st])=>{const i=STEPS.findIndex(x=>x[0]===st);o["na_"+k]=v[k]!=null||(k==="sbt"&&S.sh.b)?"":(i<0||(!stepOn(i)&&!stBlock()))||(isCtl()&&["mrs","inf","ap","sq"].includes(k))?"not_in_battery":(S.nar[k]||naAuto(k)||"unspecified")});return o}
 function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();const oK=["year","month","place","city"].filter(k=>o[k]===0||o[k]===1);
  const namK=NAMING.filter(k=>S.nam.res[k]===0||S.nam.res[k]===1),sc=infScore();
  const n=x=>x===undefined||x===null?null:x;
@@ -1036,7 +1056,7 @@ function visitRecord(){const o=S.orient,set=SETS[form()],M=S.mem,tp=timepoint();
   evc:S.ev.coins?1:0,s0:S.srt.done&&S.srt.rt!=null?Math.round(S.srt.rt):null,smc:S.srt.done&&S.srt.rt!=null&&S.sym.done&&S.sym.rt!=null?Math.round(S.sym.rt-S.srt.rt):null,gmc:S.srt.done&&S.srt.rt!=null&&S.gng.b1&&S.gng.b1.rt!=null?Math.round(S.gng.b1.rt-S.srt.rt):null,lbd:S.bis.done?S.bis.mean:null,lbc:S.bis.done?S.bis.c:null,lbl:S.bis.done?S.bis.l:null,lbr:S.bis.done?S.bis.r:null,phc:S.photos&&S.photos.clock?1:0,phf:S.photos&&S.photos.copy?1:0,srcv:S.sym.done?n(S.sym.cv):null,g1cv:S.gng.b1?n(S.gng.b1.rtcv):null,fl15:S.flu.done&&!S.flu.na?(S.flu.ts||[]).filter(t=>t<=15000).length:null,ev:evScore(),
   aro:isCtl()?null:(S.st.aro||null),at4:isCtl()?null:atTotal(),blk:stWould()?(S.st.ovr?2:1):0,fat:S.st.fat===""?null:+S.st.fat,arm:S.gate.arm==null?null:+S.gate.arm,
   sat:S.sh.a?+(S.sh.a.t/1000).toFixed(1):null,sae:S.sh.a?S.sh.a.e:null,sbt:S.sh.b?+(S.sh.b.t/1000).toFixed(1):null,sbe:S.sh.b?S.sh.b.e:null,sbec:S.sh.b?S.sh.b.ec:null,sbn:S.sh.b?S.sh.b.n:null,ssw:shSwitch(),
-  gad:S.gadNA?null:gadTotal(),ap:apTotal(),mo:moTotal(),lab:S.apNA?null:n(S.mo[3]),
+  gad:S.gadNA?null:gadTotal(),ap:apTotal(),sq:sqTotal(),lab:n(S.lab),
   mrs:n(S.mrs),phq:S.phqNA?null:phqTotal(),phq9:n(S.phq[8]),infm:S.inf.na?null:S.inf.mode,inf:sc&&!S.inf.na?sc.mean:null,infn:sc&&!S.inf.na?sc.n:null,infrel:S.inf.rel||null}}
 const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Learning slope (trial 3 minus trial 1)",""],["li","Recall intrusions during learning",""],["dr","Delayed recall","/8"],["rh","Recognition hits","/8"],["rf","Recognition false positives",""],
  ["dsf","Digit span forward",""],["dsb","Digit span backward",""],
@@ -1045,7 +1065,7 @@ const FIELDS=[["or","Orientation","/4"],["lt","Learning total","/24"],["ls","Lea
  ["g1c","Go/No-Go commissions, block 1","/8"],["g1rt","Go/No-Go median RT, block 1 (ms)",""],["g1cv","Go/No-Go RT variability (CV)",""],["gmc","Go/No-Go RT minus simple RT (ms)",""],["g2c","Go/No-Go commissions, reversed","/6"],
  ["nm","Naming","/6"],["nmd","Naming: correct but slow or self-corrected",""],["cp","Comprehension","/4"],["fl","Animal fluency",""],["fl15","Fluency, first 15 seconds",""],
  ["sat","Colour and size sequence, part A (s)",""],["sbt","Colour and size sequence, part B (s)",""],["sbe","Colour and size sequence, part B errors",""],["ssw","Switch cost per circle (ms)",""],
- ["ck","Clock","/3"],["fc","Figure copy","/2"],["ev","Everyday tasks","/4"],["mrs","mRS",""],["phq","PHQ-9",""],["gad","GAD-2","/6"],["ap","Apathy (examiner-rated)","/8"],["mo","Low mood (examiner-rated)","/6"],["lab","Emotional lability (examiner-rated)","/2"],["inf","Informant mean (1–4)",""],["at4","4AT total","/12"],["fat","Fatigue before testing (0–3)",""]];
+ ["ck","Clock","/3"],["fc","Figure copy","/2"],["ev","Everyday tasks","/4"],["mrs","mRS",""],["phq","PHQ-9",""],["gad","GAD-2","/6"],["ap","Apathy (examiner-rated)","/8"],["sq","SADQ-10","/30"],["lab","Emotionalism (draft item)","/2"],["inf","Informant mean (1–4)",""],["at4","4AT total","/12"],["fat","Fatigue before testing (0–3)",""]];
 function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absent)",""]);if(S.p.lit==="no"&&pointingMode())f.push(["Non-literate patient in pointing mode: orientation choices are written numbers and month names",""]);if(S.p.lit==="no"&&v.ev!=null)f.push(["Non-literate patient: coins and notes show printed numerals; read money scores with caution",""]);if(v.vs)f.push(["Device voice gave instructions for: "+v.vs.split("|").join(", "),""]);if(v.ex==="int")f.push(["Examiner did not speak the patient's language; interpreter used for spoken answers",""]);if(v.ex==="no_int")f.push(["Examiner did not speak the patient's language and had no interpreter: spoken-answer tasks may be unreliable",""]);if(S.gate.cmd===0)f.push(["Comprehension limited: interpret all scores with caution",""]);
  if(S.p.lit==="no")f.push(["Non-literate: digit span and clock may be affected",""]);if(S.p.edu!==""&&S.p.edu!=null&&+S.p.edu<6)f.push(["Fewer than 6 years of education",""]);
  if(S.can.done&&Math.abs(S.can.hitsL-S.can.hitsR)>=3)f.push([`Lateralised omissions on cancellation (left ${S.can.hitsL} vs right ${S.can.hitsR}): review for neglect${v.ad==='none'?'. Layout was not shifted; if neglect is confirmed, set the shift by hand at the next visit and note that the layout changed':''}`,""]);
@@ -1054,12 +1074,12 @@ function flags(v){const f=[];if(v.pm)f.push(["Pointing mode (speech output absen
  if(isPhone())f.push(["Phone-size screen",""]);if(S.intr)f.push(["Session interrupted or patient fatigued",""]);{const tq=timepoint();if(tq&&tq.lab==="Unscheduled")f.push([`Outside the scheduled windows (day ${tq.d})`,""])}if(devClass()==="computer")f.push(["Done on a computer without a touchscreen: touch-task scores are not valid","red"]);
  if(v.dm!=null&&v.dm<delayTarget())f.push([`Delayed recall given after only ${v.dm} minutes`,""]);
  if(S.phq[8]>0)f.push(["PHQ-9 item 9 positive: act on local suicide-risk protocol","red"]);
- if(!isCtl()){if(v.blk===1)f.unshift(["Not assessable: reduced arousal or 4AT 4 or more. Cognitive tasks not given; re-test","red"]);else if(v.blk===2)f.unshift(["Tested despite reduced arousal or 4AT 4 or more (senior decision): scores may reflect delirium","red"]);else if(v.at4!=null&&v.at4>=1)f.push(["4AT 1–3: possible cognitive impairment",""]);else if(v.at4==null)f.push(["Arousal and 4AT not recorded","red"])}
+ if(!isCtl()){if(v.blk===1)f.unshift(["Not assessable: reduced arousal, or fluctuation or new confusion on 4AT item 4. Cognitive tasks not given; re-test","red"]);else if(v.blk===2)f.unshift(["Tested despite reduced arousal or fluctuation (senior decision): scores may reflect delirium","red"]);else if(v.at4!=null&&v.at4>=4)f.push([`4AT ${v.at4} without signs of delirium; tested`,""]);else if(v.at4!=null&&v.at4>=1)f.push(["4AT 1–3: possible cognitive impairment",""]);if(!v.aro)f.push(["Arousal not recorded","red"]);else if(v.at4==null&&atRequired()&&v.aro!=="abn")f.push(["4AT not recorded at an acute or post-procedure visit","red"]);if(S.st.aph)f.push(["4AT items 2–3 untestable because of aphasia",""])}
  if(v.fat!=null&&v.fat>=2)f.push([`Patient ${v.fat===3?"very":"quite"} tired before testing`,""]);
  if(v.arm!=null&&v.arm>=1)f.push([`Touch tasks done with a ${v.arm===2?"clearly weak":"mildly weak or clumsy"} arm: cancellation, reaction time, pattern matching, Go/No-Go and the colour and size sequence are motor-loaded`,v.arm===2?"red":""]);
  if(S.gate.hand&&S.p.hand&&S.p.hand!=="A"&&S.gate.hand!==S.p.hand)f.push(["Touch tasks done with the non-dominant hand",""]);
  if(v.gad!=null&&v.gad>=3)f.push(["GAD-2 3 or more: assess for an anxiety disorder",""]);
- if(S.mo[1]>0&&!S.apNA)f.push(["Examiner-rated hopelessness or feeling a burden: ask about self-harm per local protocol","red"]);
+ if(S.hop==="yes")f.push(["Hopelessness, wish to die or self-harm thoughts reported: ask about self-harm per local protocol","red"]);if(!isCtl()&&S.sq.some(x=>x!=null)&&!S.sqv)f.push(["SADQ-10 version not recorded",""]);
  if(S.inf.mode==="b"&&v.inf!=null&&v.inf>=3)f.push(["Informant reports decline before the stroke: possible pre-existing impairment",""]);
  if(S.p.sens&&S.p.sens!=="yes")f.push(["Sensory limitation recorded",""]);
  if(v.ad&&v.ad!=="none")f.push([`Layout shifted for ${v.ad}-sided field loss or neglect${S.prev&&S.prev.visits.length&&"ad" in S.prev.visits[0]?" (kept from the baseline visit)":""}`,""]);
@@ -1132,13 +1152,15 @@ function rSummary(){const v=visitRecord();let stale=false;if(S.exportSnap){if(JS
  const codeDemo=(()=>{const d=Object.assign({},demo);delete d.nihss;return d})();
  /* visit code: nulls dropped, PHQ-9 item 9 excluded (the slip travels with the family), and the baseline visit plus the three most recent kept so the QR stays scannable from print */
  const NOCODE=new Set(["phq9","dt","aro","fat","arm","sae","sbe","sbec","sbn","lab"]);const lean=r=>Object.fromEntries(Object.entries(r).filter(([k,x])=>x!=null&&x!==""&&!NOCODE.has(k)));
- const allV=[...(S.prev?S.prev.visits:[]),lean(v)];
+ /* a visit blocked for arousal or delirium is replaced by its re-test in the same window; fields the re-test lacks (for example the informant's pre-stroke rating) carry over */
+ const curV=lean(v),prevV=(S.prev?S.prev.visits:[]).filter(pv=>{if(pv.blk===1&&pv.tp&&pv.tp===curV.tp){for(const [k,x] of Object.entries(pv))if(!(k in curV))curV[k]=x;curV.blk=v.blk;return false}return true});
+ const allV=[...prevV,curV];
  /* keep the first visit (baseline, informant pre-stroke rating) plus the three most recent */
  const history={v:2,demo:lean(codeDemo),visits:allV.length<=4?allV:[allV[0],...allV.slice(-3)]};
  if(!S.p.prac)packCode(history).then(c=>{$("#vcode").textContent=c;$("#cpv").disabled=false;try{if(window.qrcode){const q=qrcode(0,"L");q.addData(c);q.make();$("#qr").innerHTML=q.createSvgTag({cellSize:3,margin:2,scalable:false})}else $("#qr").innerHTML='<span class="note">QR unavailable offline; copy the text code</span>'}catch(e){$("#qr").innerHTML='<span class="note">Code too long for QR; copy the text code</span>'}
   if(c.length>900)$("#qr").insertAdjacentHTML("afterend",`<p class="warn">Long code (${c.length} characters): print the QR at least 4 cm wide, or rely on the text code.</p>`)});
  const flat=Object.assign({tool_version:VERSION},Object.fromEntries(Object.entries(demo).map(([k,x])=>["pt_"+k,x])),Object.fromEntries([...CEX,...CRF,["rf_smk"]].map(([k])=>[k,S.p[k]||""])),{setting:S.p.setting,sensory:S.p.sens||"",examiner:S.p.exr||"",examiner_id:S.p.exid||"",examiner_certified:S.p.excert||"",device_class:devClass(),gate_command:S.gate.cmd??"",gate_speech:S.gate.speech||"",tablet_hand:S.gate.hand||"",device:`${S.device.w}x${S.device.h}@${S.device.dpr}`},Object.fromEntries(Object.entries(S.idx).map(([k,x])=>["idx_"+k,Array.isArray(x)?x.join("|"):x])),{idx_fpe:fpe()??""},
-  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{arm_power:S.gate.arm??"",hand_dominant:S.gate.hand&&S.p.hand?(S.p.hand==="A"||S.gate.hand===S.p.hand?1:0):"",hand_contralesional:S.gate.hand&&["L","R"].includes(S.p.side)?(S.gate.hand!==S.p.side?1:0):"",motor_loaded_tasks:"cancel|srt|sym|gng|shift",apmood_source:S.apsrc||"",form_equivalence:"not established",fourat_not_done:S.st.atnd?1:0},naCols(v),{practice:S.p.prac?1:0,interrupted:S.intr?1:0,examiner_note:S.note||"",duration_min:S.tt?Math.round(Object.entries(S.tt).filter(([k])=>k!=="setup"&&k!=="summary").reduce((a,[,x])=>a+x,0)/6)/10:""},Object.fromEntries(STEPS.map(x=>x[0]).filter(k=>k!=="setup"&&k!=="summary").map(k=>["t_"+k,S.tt&&S.tt[k]!=null?S.tt[k]:""])),{flags:f.map(x=>x[0]).join(" | ")});
+  Object.fromEntries(Object.entries(v).map(([k,x])=>[k,x==null?"":x])),(()=>{const ps=provScores(v);return Object.assign(Object.fromEntries(ps.dom.map(([n,x])=>["prov_"+n.split(" ")[0].toLowerCase(),x??""])),{prov_index:ps.idx??""})})(),{arm_power:S.gate.arm??"",hand_dominant:S.gate.hand&&S.p.hand?(S.p.hand==="A"||S.gate.hand===S.p.hand?1:0):"",hand_contralesional:S.gate.hand&&["L","R"].includes(S.p.side)?(S.gate.hand!==S.p.side?1:0):"",motor_loaded_tasks:"cancel|srt|sym|gng|shift",apmood_source:S.apsrc||"",sadq_version:S.sqv||"",safety_hopelessness:S.hop||"",fourat_required:atRequired()?1:0,fourat_item4_delirium:S.st.dlx||"",fourat_23_aphasia:S.st.aph?1:0,form_equivalence:"not established",fourat_not_done:S.st.atnd?1:0},naCols(v),{practice:S.p.prac?1:0,interrupted:S.intr?1:0,examiner_note:S.note||"",duration_min:S.tt?Math.round(Object.entries(S.tt).filter(([k])=>k!=="setup"&&k!=="summary").reduce((a,[,x])=>a+x,0)/6)/10:""},Object.fromEntries(STEPS.map(x=>x[0]).filter(k=>k!=="setup"&&k!=="summary").map(k=>["t_"+k,S.tt&&S.tt[k]!=null?S.tt[k]:""])),{flags:f.map(x=>x[0]).join(" | ")});
  const keys=csvKeys(flat),q=x=>`"${String(x).replace(/"/g,'""')}"`,csv=keys.join(",")+"\n"+keys.map(k=>q(flat[k])).join(",");
  $("#out").value=csv;logRecord(Object.fromEntries(keys.map(k=>[k,flat[k]??""])));renderLogBox();
  const cp=(txt,lab,onOk)=>{$("#out").value=txt;$("#out").select();const ok=()=>{$("#cpmsg").textContent=lab+" copied";if(onOk)onOk()},fail=()=>{$("#cpmsg").textContent=lab+" was NOT copied. Select the text in the box and copy it by hand."};const legacy=()=>{let r=false;try{r=document.execCommand("copy")}catch(_){}r?ok():fail()};try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,legacy);else legacy()}catch(e){legacy()}};
