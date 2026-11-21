@@ -32,6 +32,12 @@ This repository holds both releases from the same code:
 3. In `android-app/android/app/build.gradle`, raise `versionCode` by one and set `versionName`.
 4. Commit. The website updates on its own. Run the Android workflow and upload the new `.aab` to Play.
 
+## Contributors
+
+Author: Dr Sabha Ahmed.
+
+Clinical and psychometric review: Dr Karthik Sanghai, neuropsychiatrist.
+
 ## Licence and citation
 
 Software: MIT. Instrument content (items, drawings, scoring, translations): CC BY-NC-ND 4.0. See `LICENSE`, `THIRD_PARTY.md` and `CITATION.cff`. Each GitHub release is archived on Zenodo; the DOI below always resolves to the latest version. Cite StrokeSmriti as: Ahmed S. StrokeSmriti: a multilingual, offline, clinician-administered assessment of cognitive outcomes after stroke and stroke procedures. Zenodo. doi:10.5281/zenodo.24323874
