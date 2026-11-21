@@ -1,0 +1,42 @@
+# Deploys the app to Cloudflare Pages behind a Cloudflare Access email login.
+# Needs repo secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, EXAMINER_EMAILS (comma-separated)
+# and repo variable SITE_DOMAIN (e.g. strokesmriti.in). Does nothing until they exist.
+name: Deploy to Cloudflare (login)
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", "scripts/cloudflare_access.sh", ".github/workflows/cloudflare.yml"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      EMAILS: ${{ secrets.EXAMINER_EMAILS }}
+      DOMAIN: ${{ vars.SITE_DOMAIN }}
+    steps:
+      - name: Check setup
+        id: chk
+        run: |
+          if [ -z "$CF_TOKEN" ] || [ -z "$CF_ACCOUNT" ] || [ -z "$DOMAIN" ] || [ -z "$EMAILS" ]; then
+            echo "Cloudflare secrets or SITE_DOMAIN not set yet; skipping."; echo "ok=0" >> "$GITHUB_OUTPUT"
+          else echo "ok=1" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.chk.outputs.ok == '1'
+      - name: Login rules first (so the site is never public on the new domain)
+        if: steps.chk.outputs.ok == '1'
+        run: bash scripts/cloudflare_access.sh
+      - name: Deploy site
+        if: steps.chk.outputs.ok == '1'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler@3 pages project create strokesmriti --production-branch main || true
+          npx --yes wrangler@3 pages deploy web --project-name strokesmriti --branch main --commit-dirty=true
+      - name: Attach domain
+        if: steps.chk.outputs.ok == '1'
+        run: |
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/strokesmriti/domains" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" --data "{\"name\":\"$DOMAIN\"}" | jq -c '{success,errors}'
