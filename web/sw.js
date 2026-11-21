@@ -32,6 +32,8 @@ self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request).then(res => {
-    const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); return res;
+    /* cache only real app files: never a login page, a redirect or another site's response */
+    if (res.ok && !res.redirected && res.type === "basic") { const copy = res.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); }
+    return res;
   }).catch(() => e.request.mode === "navigate" ? caches.match("./index.html") : Response.error())));
 });
